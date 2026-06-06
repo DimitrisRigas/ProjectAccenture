@@ -1,0 +1,20 @@
+resources:
+  jobs:
+    bronze_ingestion_job:
+      name: regulatory_compliance_bronze_ingestion
+
+      tasks:
+        - task_key: bronze_ingestion
+
+          spark_python_task:
+            python_file: ../src/jobs/bronze_ingestion.py
+
+          environment_key: bronze_environment
+
+      environments:
+        - environment_key: bronze_environment
+          spec:
+            client: "2"
+            dependencies:
+              - pymupdf
+              - beautifulsoup4
