@@ -18,3 +18,21 @@ resources:
             dependencies:
               - pymupdf
               - beautifulsoup4
+
+    silver_chunking_job:
+      name: regulatory_compliance_silver_chunking
+
+      tasks:
+        - task_key: silver_chunking
+
+          spark_python_task:
+            python_file: ../src/jobs/silver_chunking.py
+
+          environment_key: silver_environment
+
+      environments:
+        - environment_key: silver_environment
+          spec:
+            client: "2"
+            dependencies:
+              - langchain-text-splitters
