@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EU Regulatory Compliance Assistant</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --purple: #7c3aed;
+            --cyan: #06b6d4;
+            --green: #16a34a;
+            --red: #dc2626;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: rgba(226, 232, 240, 0.9);
+            --shadow: 0 30px 90px rgba(2, 6, 23, 0.28);
+            --soft-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            background: #020617;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .nav-shell {
+            position: fixed;
+            top: 18px;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 0 18px;
+        }
+
+        .nav {
+            max-width: 1220px;
+            margin: 0 auto;
+            padding: 12px;
+            border-radius: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            background: rgba(15, 23, 42, 0.70);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 18px 60px rgba(2, 6, 23, 0.30);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            color: white;
+        }
+
+        .logo {
+            width: 46px;
+            height: 46px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            color: white;
+            font-size: 23px;
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            box-shadow: 0 14px 35px rgba(37, 99, 235, 0.42);
+        }
+
+        .brand-title {
+            font-weight: 900;
+            font-size: 18px;
+            letter-spacing: -0.4px;
+        }
+
+        .brand-subtitle {
+            margin-top: 2px;
+            color: rgba(255, 255, 255, 0.66);
+            font-size: 12px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            cursor: pointer;
+            border-radius: 999px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.10);
+            color: rgba(255, 255, 255, 0.82);
+            font-weight: 850;
+            transition: all 0.16s ease;
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            background: white;
+            color: #0f172a;
+        }
+
+        .status-pill {
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.88);
+            font-weight: 850;
+            font-size: 13px;
+            backdrop-filter: blur(16px);
+        }
+
+        /* CHAT PAGE */
+
+        .hero {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            padding: 132px 22px 60px;
+            background:
+                linear-gradient(rgba(2, 6, 23, 0.68), rgba(2, 6, 23, 0.62)),
+                url("https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=2200&q=80");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.38), transparent 28%),
+                radial-gradient(circle at 80% 30%, rgba(124, 58, 237, 0.35), transparent 25%),
+                radial-gradient(circle at 55% 90%, rgba(6, 182, 212, 0.20), transparent 32%);
+            pointer-events: none;
+        }
+
+        .hero-inner {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1220px;
+            margin: 0 auto;
+        }
+
+        .hero-content {
+            max-width: 950px;
+            margin: 0 auto;
+            text-align: center;
+            color: white;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 15px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.23);
+            backdrop-filter: blur(16px);
+            color: white;
+            font-size: 14px;
+            font-weight: 850;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(42px, 7vw, 86px);
+            line-height: 0.94;
+            letter-spacing: -3px;
+        }
+
+        .hero-text {
+            max-width: 760px;
+            margin: 24px auto 0;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 19px;
+            line-height: 1.75;
+        }
+
+        .chat-shell {
+            max-width: 930px;
+            margin: 44px auto 0;
+            border-radius: 36px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.42), rgba(255,255,255,0.12));
+            box-shadow: var(--shadow);
+        }
+
+        .chat-card {
+            border-radius: 35px;
+            padding: 23px;
+            background: rgba(15, 23, 42, 0.64);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(22px);
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        .chat-title {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-weight: 900;
+            letter-spacing: -0.3px;
+        }
+
+        .chat-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 999px;
+            background: #22c55e;
+            box-shadow: 0 0 0 7px rgba(34, 197, 94, 0.14);
+        }
+
+        .chat-mode {
+            font-size: 13px;
+            color: rgba(255,255,255,0.68);
+            border: 1px solid rgba(255,255,255,0.18);
+            padding: 7px 10px;
+            border-radius: 999px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 145px;
+            resize: vertical;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.16);
+            border-radius: 24px;
+            outline: none;
+            font-size: 17px;
+            line-height: 1.58;
+            color: white;
+            background: rgba(2, 6, 23, 0.48);
+            transition: all 0.2s ease;
+        }
+
+        textarea::placeholder {
+            color: rgba(255,255,255,0.46);
+        }
+
+        textarea:focus {
+            border-color: rgba(96, 165, 250, 0.82);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.22);
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            border-radius: 18px;
+            padding: 15px 20px;
+            font-size: 15px;
+            font-weight: 900;
+            transition: all 0.16s ease;
+        }
+
+        .primary-btn {
+            flex: 1;
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            box-shadow: 0 18px 42px rgba(37, 99, 235, 0.38);
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 22px 50px rgba(37, 99, 235, 0.48);
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.72;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.20);
+        }
+
+        .examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .example-chip {
+            padding: 10px 13px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .example-chip:hover {
+            background: rgba(255, 255, 255, 0.20);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .error {
+            display: none;
+            margin-top: 18px;
+            padding: 15px;
+            border-radius: 16px;
+            background: rgba(254, 242, 242, 0.96);
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .results-section {
+            background:
+                linear-gradient(180deg, #020617, #0f172a 32%, #f8fafc 32%);
+            padding: 76px 20px 70px;
+        }
+
+        .results-inner {
+            max-width: 1220px;
+            margin: 0 auto;
+        }
+
+        .empty-card,
+        .result-card {
+            border-radius: 32px;
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 30px 90px rgba(15, 23, 42, 0.18);
+            overflow: hidden;
+        }
+
+        .empty-card {
+            padding: 46px 28px;
+            text-align: center;
+            color: #475569;
+        }
+
+        .empty-visual {
+            width: min(100%, 620px);
+            height: 250px;
+            margin: 0 auto 26px;
+            border-radius: 28px;
+            background:
+                linear-gradient(rgba(15, 23, 42, 0.20), rgba(15, 23, 42, 0.35)),
+                url("https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1400&q=80");
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
+        }
+
+        .section-title {
+            margin: 0 0 8px;
+            font-size: 28px;
+            letter-spacing: -0.8px;
+        }
+
+        .section-subtitle {
+            margin: 0 auto;
+            max-width: 700px;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        .result-card {
+            display: none;
+        }
+
+        .result-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            background: rgba(248, 250, 252, 0.88);
+        }
+
+        .result-header h2 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: -0.6px;
+        }
+
+        .retrieved-status {
+            font-size: 13px;
+            font-weight: 900;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .answer {
+            padding: 30px;
+            font-size: 18px;
+            line-height: 1.85;
+            white-space: pre-wrap;
+        }
+
+        .sources {
+            padding: 0 30px 30px;
+        }
+
+        .sources h3 {
+            margin: 10px 0 16px;
+            font-size: 19px;
+        }
+
+        details {
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: white;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        summary {
+            cursor: pointer;
+            padding: 17px 19px;
+            font-weight: 900;
+            color: #334155;
+            background: linear-gradient(135deg, #f8fafc, #eef2ff);
+        }
+
+        .chunk-body {
+            padding: 19px;
+            color: #475569;
+            line-height: 1.72;
+            white-space: pre-wrap;
+        }
+
+        .metadata {
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 15px;
+            background: #f1f5f9;
+            color: #334155;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .source-link {
+            color: var(--primary);
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .source-link:hover {
+            text-decoration: underline;
+        }
+
+        pre {
+            margin: 8px 0 0;
+            white-space: pre-wrap;
+        }
+
+        /* ABOUT PAGE */
+
+        .about-hero {
+            min-height: 72vh;
+            padding: 132px 22px 70px;
+            position: relative;
+            background:
+                linear-gradient(rgba(2, 6, 23, 0.72), rgba(2, 6, 23, 0.66)),
+                url("https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=2200&q=80");
+            background-size: cover;
+            background-position: center;
+        }
+
+        .about-hero-inner {
+            max-width: 1220px;
+            margin: 0 auto;
+            color: white;
+        }
+
+        .about-hero h1 {
+            max-width: 920px;
+        }
+
+        .about-hero p {
+            max-width: 790px;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 19px;
+            line-height: 1.75;
+            margin-top: 24px;
+        }
+
+        .about-content {
+            background:
+                radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(124, 58, 237, 0.13), transparent 28%),
+                #f8fafc;
+            padding: 58px 20px 80px;
+        }
+
+        .about-inner {
+            max-width: 1220px;
+            margin: 0 auto;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+            margin-bottom: 28px;
+        }
+
+        .about-card {
+            padding: 28px;
+            border-radius: 30px;
+            background: white;
+            border: 1px solid var(--border);
+            box-shadow: var(--soft-shadow);
+        }
+
+        .about-card.wide {
+            grid-column: 1 / -1;
+        }
+
+        .about-card h2 {
+            margin: 0 0 12px;
+            font-size: 28px;
+            letter-spacing: -0.8px;
+        }
+
+        .about-card p {
+            margin: 0;
+            color: #475569;
+            line-height: 1.75;
+            font-size: 16px;
+        }
+
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .tech-pill {
+            padding: 9px 12px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #3730a3;
+            font-size: 13px;
+            font-weight: 850;
+            border: 1px solid #e0e7ff;
+        }
+
+        .pipeline {
+            margin-top: 22px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .pipeline-step {
+            display: grid;
+            grid-template-columns: 58px 1fr;
+            gap: 16px;
+            align-items: start;
+            padding: 18px;
+            border-radius: 22px;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 17px;
+            display: grid;
+            place-items: center;
+            color: white;
+            font-weight: 950;
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.25);
+        }
+
+        .pipeline-step strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .pipeline-step span {
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .split-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .split-card {
+            padding: 18px;
+            border-radius: 22px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+        }
+
+        .split-card strong {
+            display: block;
+            margin-bottom: 7px;
+        }
+
+        .split-card span {
+            color: var(--muted);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .about-image-strip {
+            margin-top: 28px;
+            min-height: 300px;
+            border-radius: 32px;
+            background:
+                linear-gradient(rgba(15, 23, 42, 0.18), rgba(15, 23, 42, 0.48)),
+                url("https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=1800&q=80");
+            background-size: cover;
+            background-position: center;
+            box-shadow: var(--soft-shadow);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px 20px;
+            color: #94a3b8;
+            background: #020617;
+            font-size: 14px;
+        }
+
+        .loader {
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            border-top-color: white;
+            border-radius: 50%;
+            display: inline-block;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 940px) {
+            .about-grid,
+            .split-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .nav-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero,
+            .about-hero {
+                padding: 150px 14px 42px;
+            }
+
+            h1 {
+                letter-spacing: -1.5px;
+            }
+
+            .chat-card {
+                padding: 16px;
+            }
+
+            .chat-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .examples {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .answer,
+            .sources,
+            .about-card {
+                padding: 22px;
+            }
+
+            .empty-visual {
+                height: 200px;
+            }
+
+            .pipeline-step {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav-shell">
+        <nav class="nav">
+            <div class="brand">
+                <div class="logo">⚖️</div>
+                <div>
+                    <div class="brand-title">EU Regulatory Compliance Assistant</div>
+                    <div class="brand-subtitle">Databricks · Azure AI Search · GPT-4o RAG</div>
+                </div>
+            </div>
+
+            <div class="nav-actions">
+                <button class="nav-btn active" id="chatNavBtn" onclick="showPage('chat')">Chat</button>
+                <button class="nav-btn" id="aboutNavBtn" onclick="showPage('about')">About Project</button>
+                <div class="status-pill" id="apiStatus">API: checking...</div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- CHAT PAGE -->
+    <main class="page active" id="chatPage">
+        <section class="hero">
+            <div class="hero-inner">
+                <div class="hero-content">
+                    <div class="badge">AI-powered compliance intelligence</div>
+                    <h1>Understand regulation faster.</h1>
+                    <p class="hero-text">
+                        Ask questions across GDPR, DORA, PSD2, MiFID II, the EU AI Act, and other
+                        regulatory documents. Get grounded answers with retrieved sources, page numbers,
+                        document titles, and source links.
+                    </p>
+
+                    <div class="chat-shell">
+                        <div class="chat-card">
+                            <div class="chat-header">
+                                <div class="chat-title">
+                                    <span class="chat-dot"></span>
+                                    Compliance chat
+                                </div>
+                                <div class="chat-mode">Live RAG backend · Azure AI Search</div>
+                            </div>
+
+                            <textarea
+                                id="questionInput"
+                                placeholder="Ask something like: According to GDPR, what obligations do controllers have for personal data protection?"
+                            ></textarea>
+
+                            <div class="actions">
+                                <button class="primary-btn" id="askBtn" onclick="askQuestion()">
+                                    Ask assistant
+                                </button>
+
+                                <button class="secondary-btn" onclick="clearAll()">
+                                    Clear
+                                </button>
+                            </div>
+
+                            <div class="examples">
+                                <div class="example-chip" onclick="setExample('According to GDPR, what obligations do controllers have for personal data protection?')">
+                                    GDPR controller obligations
+                                </div>
+                                <div class="example-chip" onclick="setExample('What does DORA require from financial entities?')">
+                                    DORA financial entities
+                                </div>
+                                <div class="example-chip" onclick="setExample('What is the purpose of PSD2?')">
+                                    PSD2 purpose
+                                </div>
+                                <div class="example-chip" onclick="setExample('How does MiFID II relate to investor protection?')">
+                                    MiFID II investor protection
+                                </div>
+                                <div class="example-chip" onclick="setExample('What are the risk management ideas in the EU AI Act?')">
+                                    AI Act risk management
+                                </div>
+                            </div>
+
+                            <div class="error" id="errorBox"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="results-section" id="results">
+            <div class="results-inner">
+                <section class="empty-card" id="emptyState">
+                    <div class="empty-visual"></div>
+                    <h2 class="section-title">Your answer will appear here</h2>
+                    <p class="section-subtitle">
+                        The assistant will display a generated answer followed by retrieved regulatory
+                        sources, including document title, page number, file name, source URL, score,
+                        and chunk preview.
+                    </p>
+                </section>
+
+                <section class="result-card" id="resultCard">
+                    <div class="result-header">
+                        <h2>Generated answer</h2>
+                        <span class="retrieved-status" id="statusBadge">Retrieved from Azure AI Search</span>
+                    </div>
+
+                    <div class="answer" id="answerBox"></div>
+
+                    <div class="sources">
+                        <h3>Retrieved sources</h3>
+                        <div id="chunksBox"></div>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <!-- ABOUT PAGE -->
+    <main class="page" id="aboutPage">
+        <section class="about-hero">
+            <div class="about-hero-inner">
+                <div class="badge">Project overview</div>
+                <h1>Built for governed regulatory intelligence.</h1>
+                <p>
+                    This project implements an AI-powered compliance assistant for EU financial
+                    institutions. It combines regulatory document ingestion, Databricks data
+                    engineering, Delta tables, Azure OpenAI embeddings, Azure AI Search, FastAPI,
+                    and retrieval-augmented generation into one end-to-end knowledge platform.
+                </p>
+            </div>
+        </section>
+
+        <section class="about-content">
+            <div class="about-inner">
+                <div class="about-grid">
+                    <div class="about-card">
+                        <h2>Business problem</h2>
+                        <p>
+                            Financial institutions must continuously understand and comply with complex
+                            EU regulations such as GDPR, DORA, PSD2, MiFID II, and the EU AI Act.
+                            Traditional keyword search is often not enough because compliance questions
+                            require context, semantic retrieval, and traceable answers.
+                        </p>
+                    </div>
+
+                    <div class="about-card">
+                        <h2>Project objective</h2>
+                        <p>
+                            The goal is to provide a regulatory compliance assistant that accepts
+                            natural-language questions and returns grounded answers based on retrieved
+                            regulatory chunks, with clear references to the source regulation, file,
+                            page number, and URL.
+                        </p>
+                    </div>
+
+                    <div class="about-card wide">
+                        <h2>Implemented architecture</h2>
+                        <p>
+                            The system uses Databricks as the governed data engineering layer and Azure
+                            AI Search as the application retrieval layer. Raw regulatory files are
+                            uploaded to Databricks, transformed into Bronze/Silver/Gold Delta tables,
+                            embedded through Azure OpenAI, indexed in Azure AI Search, and queried by
+                            a FastAPI backend connected to this frontend.
+                        </p>
+
+                        <div class="pipeline">
+                            <div class="pipeline-step">
+                                <div class="step-number">1</div>
+                                <div>
+                                    <strong>Document acquisition</strong>
+                                    <span>Regulatory documents are collected from EUR-Lex and other official EU sources in PDF, HTML, and XML formats.</span>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step">
+                                <div class="step-number">2</div>
+                                <div>
+                                    <strong>Metadata manifest</strong>
+                                    <span>A manifest tracks CELEX ID, short title, regulation title, source URL, file format, SHA256 hash, and ingestion status.</span>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step">
+                                <div class="step-number">3</div>
+                                <div>
+                                    <strong>Databricks Volume</strong>
+                                    <span>Raw regulatory files and metadata are uploaded to a Unity Catalog Volume for governed storage.</span>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step">
+                                <div class="step-number">4</div>
+                                <div>
+                                    <strong>Bronze tables</strong>
+                                    <span>The Bronze job extracts raw document text and stores document-level and page-level regulatory data in Delta tables.</span>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step">
+                                <div class="step-number">5</div>
+                                <div>
+                                    <strong>Silver chunks</strong>
+                                    <span>The Silver job splits extracted text into overlapping, AI-ready chunks while preserving metadata and lineage.</span>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step">
+                                <div class="step-number">6</div>
+                                <div>
+                                    <strong>Gold retrieval table</strong>
+                                    <span>The Gold job prepares clean chunks and metadata such as short title, regulation title, source URL, page number, and file name.</span>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step">
+                                <div class="step-number">7</div>
+                                <div>
+                                    <strong>Azure AI Search index</strong>
+                                    <span>The pipeline creates an Azure AI Search vector index and uploads embedded chunks using Azure OpenAI text-embedding-3-small.</span>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step">
+                                <div class="step-number">8</div>
+                                <div>
+                                    <strong>FastAPI RAG service</strong>
+                                    <span>The backend exposes a /ask endpoint that embeds the question, retrieves relevant sources, and generates an answer using GPT-4o.</span>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step">
+                                <div class="step-number">9</div>
+                                <div>
+                                    <strong>Frontend interface</strong>
+                                    <span>The web interface lets users ask compliance questions and inspect the retrieved evidence behind each answer.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-card">
+                        <h2>Current status</h2>
+                        <p>
+                            The end-to-end pipeline has been completed. The Databricks Bundle runs
+                            Bronze ingestion, Silver chunking, Gold preparation, Azure AI Search index
+                            creation, Azure OpenAI embedding generation, and document upload. The
+                            FastAPI backend successfully answers questions through the /ask endpoint.
+                        </p>
+                    </div>
+
+                    <div class="about-card">
+                        <h2>Technologies used</h2>
+                        <p>
+                            The implementation combines Python, uv, FastAPI, Databricks, Unity Catalog,
+                            Delta Lake, Databricks Bundles, PySpark, Azure OpenAI, Azure AI Search,
+                            GPT-4o, and a modern HTML/CSS/JavaScript frontend.
+                        </p>
+
+                        <div class="pill-row">
+                            <span class="tech-pill">Python</span>
+                            <span class="tech-pill">FastAPI</span>
+                            <span class="tech-pill">Databricks</span>
+                            <span class="tech-pill">Delta Lake</span>
+                            <span class="tech-pill">Unity Catalog</span>
+                            <span class="tech-pill">PySpark</span>
+                            <span class="tech-pill">Azure OpenAI</span>
+                            <span class="tech-pill">Azure AI Search</span>
+                            <span class="tech-pill">GPT-4o</span>
+                            <span class="tech-pill">RAG</span>
+                        </div>
+                    </div>
+
+                    <div class="about-card wide">
+                        <h2>Component responsibilities</h2>
+                        <p>
+                            The solution is split into three main layers. Databricks handles governed
+                            ingestion and transformation, Azure handles embeddings and vector search,
+                            and the FastAPI/frontend layer exposes the final assistant to users.
+                        </p>
+
+                        <div class="split-grid">
+                            <div class="split-card">
+                                <strong>Data engineering</strong>
+                                <span>Downloader, uploader, manifest, Databricks Volume, Bronze/Silver/Gold Delta tables.</span>
+                            </div>
+
+                            <div class="split-card">
+                                <strong>AI retrieval</strong>
+                                <span>Azure OpenAI embeddings, Azure AI Search indexing, semantic retrieval, and GPT-4o generation.</span>
+                            </div>
+
+                            <div class="split-card">
+                                <strong>Application layer</strong>
+                                <span>FastAPI /ask endpoint, frontend interface, source rendering, and final RAG integration.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-image-strip"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        Backend endpoint: <strong id="endpointLabel">http://127.0.0.1:8000/ask</strong>
+    </footer>
+
+    <script>
+        const API_BASE_URL = "http://127.0.0.1:8000";
+        const QUERY_URL = `${API_BASE_URL}/ask`;
+
+        const questionInput = document.getElementById("questionInput");
+        const askBtn = document.getElementById("askBtn");
+        const answerBox = document.getElementById("answerBox");
+        const chunksBox = document.getElementById("chunksBox");
+        const resultCard = document.getElementById("resultCard");
+        const emptyState = document.getElementById("emptyState");
+        const errorBox = document.getElementById("errorBox");
+        const apiStatus = document.getElementById("apiStatus");
+        const endpointLabel = document.getElementById("endpointLabel");
+
+        endpointLabel.textContent = QUERY_URL;
+
+        function showPage(pageName) {
+            const chatPage = document.getElementById("chatPage");
+            const aboutPage = document.getElementById("aboutPage");
+            const chatNavBtn = document.getElementById("chatNavBtn");
+            const aboutNavBtn = document.getElementById("aboutNavBtn");
+
+            if (pageName === "chat") {
+                chatPage.classList.add("active");
+                aboutPage.classList.remove("active");
+                chatNavBtn.classList.add("active");
+                aboutNavBtn.classList.remove("active");
+            }
+
+            if (pageName === "about") {
+                aboutPage.classList.add("active");
+                chatPage.classList.remove("active");
+                aboutNavBtn.classList.add("active");
+                chatNavBtn.classList.remove("active");
+            }
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+            });
+        }
+
+        function setExample(question) {
+            showPage("chat");
+            questionInput.value = question;
+            questionInput.focus();
+        }
+
+        function clearAll() {
+            questionInput.value = "";
+            answerBox.textContent = "";
+            chunksBox.innerHTML = "";
+            errorBox.style.display = "none";
+            resultCard.style.display = "none";
+            emptyState.style.display = "block";
+            askBtn.disabled = false;
+            askBtn.textContent = "Ask assistant";
+        }
+
+        async function checkApiStatus() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/`);
+
+                if (!response.ok) {
+                    throw new Error("API returned an error.");
+                }
+
+                apiStatus.textContent = "API: online";
+                apiStatus.style.color = "#166534";
+                apiStatus.style.background = "#dcfce7";
+                apiStatus.style.borderColor = "#bbf7d0";
+            } catch (error) {
+                apiStatus.textContent = "API: offline";
+                apiStatus.style.color = "#991b1b";
+                apiStatus.style.background = "#fef2f2";
+                apiStatus.style.borderColor = "#fecaca";
+            }
+        }
+
+        async function askQuestion() {
+            const question = questionInput.value.trim();
+
+            if (!question) {
+                showError("Please type a question first.");
+                return;
+            }
+
+            setLoading(true);
+            errorBox.style.display = "none";
+            resultCard.style.display = "none";
+            emptyState.style.display = "none";
+            answerBox.textContent = "";
+            chunksBox.innerHTML = "";
+
+            try {
+                const response = await fetch(QUERY_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        top_k: 5,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || "Request failed.");
+                }
+
+                renderAnswer(data);
+
+                document.getElementById("results").scrollIntoView({
+                    behavior: "smooth",
+                });
+            } catch (error) {
+                emptyState.style.display = "block";
+                showError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function renderAnswer(data) {
+            resultCard.style.display = "block";
+            emptyState.style.display = "none";
+
+            answerBox.textContent = data.answer || "No answer returned.";
+
+            const sources = data.sources || [];
+
+            if (sources.length === 0) {
+                chunksBox.innerHTML = "<p class='section-subtitle'>No sources were returned.</p>";
+                return;
+            }
+
+            chunksBox.innerHTML = sources.map((source, index) => {
+                const preview = escapeHtml(source.chunk_preview || "No preview available.");
+                const sourceNumber = source.source_number || index + 1;
+                const shortTitle = source.short_title || "Unknown document";
+                const regulationTitle = source.regulation_title || "N/A";
+                const fileName = source.file_name || "N/A";
+
+                const pageNumber = source.page_number !== null && source.page_number !== undefined
+                    ? `Page ${source.page_number}`
+                    : "Page N/A";
+
+                const score = source.score !== null && source.score !== undefined
+                    ? Number(source.score).toFixed(4)
+                    : "N/A";
+
+                const sourceUrl = source.source_url
+                    ? `<p><strong>Source URL:</strong> <a class="source-link" href="${escapeHtml(source.source_url)}" target="_blank" rel="noopener noreferrer">Open regulatory document</a></p>`
+                    : "";
+
+                const metadata = {
+                    chunk_id: source.chunk_id,
+                    short_title: source.short_title,
+                    regulation_title: source.regulation_title,
+                    file_name: source.file_name,
+                    page_number: source.page_number,
+                    source_url: source.source_url,
+                    score: source.score,
+                };
+
+                const metadataPretty = escapeHtml(JSON.stringify(metadata, null, 2));
+
+                return `
+                    <details>
+                        <summary>
+                            Source ${escapeHtml(String(sourceNumber))} — ${escapeHtml(shortTitle)}
+                            | ${escapeHtml(pageNumber)}
+                            | Score: ${escapeHtml(String(score))}
+                        </summary>
+                        <div class="chunk-body">
+                            <strong>Regulation:</strong> ${escapeHtml(regulationTitle)}
+                            <br>
+                            <strong>File:</strong> ${escapeHtml(fileName)}
+                            <br>
+                            <strong>Chunk ID:</strong> ${escapeHtml(String(source.chunk_id || "N/A"))}
+                            <br>
+                            ${sourceUrl}
+
+                            <br>
+                            <strong>Preview:</strong>
+                            <br><br>
+                            ${preview}
+
+                            <div class="metadata">
+                                <strong>Metadata:</strong>
+                                <pre>${metadataPretty}</pre>
+                            </div>
+                        </div>
+                    </details>
+                `;
+            }).join("");
+        }
+
+        function setLoading(isLoading) {
+            askBtn.disabled = isLoading;
+
+            if (isLoading) {
+                askBtn.innerHTML = "<span class='loader'></span>Thinking...";
+            } else {
+                askBtn.textContent = "Ask assistant";
+            }
+        }
+
+        function showError(message) {
+            errorBox.textContent = message;
+            errorBox.style.display = "block";
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        questionInput.addEventListener("keydown", function (event) {
+            if (event.ctrlKey && event.key === "Enter") {
+                askQuestion();
+            }
+        });
+
+        checkApiStatus();
+    </script>
+</body>
+</html>

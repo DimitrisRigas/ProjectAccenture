@@ -1,438 +1,323 @@
 """
-Download selected EU regulatory documents from EUR-Lex.
+src/downloader.py
 
-This script supports multiple document formats, not only PDFs.
+Simplified regulatory data downloader.
 
-Supported formats in this first version:
-- PDF
-- HTML
-- XML
+Downloads / registers:
+- EUR-Lex PDFs from manual browser-downloaded files in data/manual/pdf/
+- 1 HTML regulatory page from EBA
+- 1 XML API file from ECB
 
-Project step:
-    6.4 Data Ingestion & Regulatory Data Acquisition
+Creates:
+- data/raw/pdf/
+- data/raw/html/
+- data/raw/xml/
+- data/metadata/document_manifest.json
 
-The script also creates a metadata manifest for traceability,
-lineage, and later loading into Databricks Delta tables.
-
-file: ex1_download_documents.py
+The manual EUR-Lex safeguard is kept because EUR-Lex may block automated downloads.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
 
-RAW_DATA_DIR = Path("data") / "raw"
-METADATA_DIR = Path("data") / "metadata"
+# Because this file is located at:
+# ProjectAccenture/src/downloader.py
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+DATA_DIR = PROJECT_ROOT / "data"
+RAW_DIR = DATA_DIR / "raw"
+MANUAL_PDF_DIR = DATA_DIR / "manual" / "pdf"
+
+PDF_DIR = RAW_DIR / "pdf"
+HTML_DIR = RAW_DIR / "html"
+XML_DIR = RAW_DIR / "xml"
+
+METADATA_DIR = DATA_DIR / "metadata"
 MANIFEST_PATH = METADATA_DIR / "document_manifest.json"
 
 
-SUPPORTED_FORMATS = {"pdf", "html", "xml"}
-
-
-EU_REGULATORY_DOCUMENTS: list[dict[str, Any]] = [
+DOCUMENTS = [
     {
         "document_id": "32016R0679",
         "celex": "32016R0679",
         "short_title": "GDPR",
-        "regulation_title": "General Data Protection Regulation",
-        "description": "Regulation on data protection and privacy in the European Union.",
-        "issuing_authority": "European Parliament and Council of the European Union",
-        "regulation_category": "Data Protection",
-        "compliance_domain": "Privacy and Data Governance",
-        "document_type": "Regulation",
-        "language": "EN",
-        "formats": ["pdf", "html", "xml"],
+        "title": "General Data Protection Regulation",
+        "category": "Data Protection",
+        "source_system": "EUR-Lex",
+        "source_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679",
+        "file_format": "pdf",
+        "file_name": "32016R0679_GDPR_EN.pdf",
+        "method": "manual",
     },
     {
         "document_id": "32022R2554",
         "celex": "32022R2554",
         "short_title": "DORA",
-        "regulation_title": "Digital Operational Resilience Act",
-        "description": "Regulation on digital operational resilience for the financial sector.",
-        "issuing_authority": "European Parliament and Council of the European Union",
-        "regulation_category": "Digital Finance",
-        "compliance_domain": "ICT Risk Management",
-        "document_type": "Regulation",
-        "language": "EN",
-        "formats": ["pdf", "html", "xml"],
+        "title": "Digital Operational Resilience Act",
+        "category": "Digital Finance",
+        "source_system": "EUR-Lex",
+        "source_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32022R2554",
+        "file_format": "pdf",
+        "file_name": "32022R2554_DORA_EN.pdf",
+        "method": "manual",
     },
     {
         "document_id": "32015L2366",
         "celex": "32015L2366",
         "short_title": "PSD2",
-        "regulation_title": "Payment Services Directive 2",
-        "description": "Directive on payment services in the internal market.",
-        "issuing_authority": "European Parliament and Council of the European Union",
-        "regulation_category": "Payments",
-        "compliance_domain": "Banking and Payment Services",
-        "document_type": "Directive",
-        "language": "EN",
-        "formats": ["pdf", "html", "xml"],
+        "title": "Payment Services Directive 2",
+        "category": "Payments",
+        "source_system": "EUR-Lex",
+        "source_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32015L2366",
+        "file_format": "pdf",
+        "file_name": "32015L2366_PSD2_EN.pdf",
+        "method": "manual",
     },
     {
         "document_id": "32014L0065",
         "celex": "32014L0065",
         "short_title": "MiFID_II",
-        "regulation_title": "Markets in Financial Instruments Directive II",
-        "description": "Directive on markets in financial instruments.",
-        "issuing_authority": "European Parliament and Council of the European Union",
-        "regulation_category": "Financial Markets",
-        "compliance_domain": "Investment Services and Trading Venues",
-        "document_type": "Directive",
-        "language": "EN",
-        "formats": ["pdf", "html", "xml"],
+        "title": "Markets in Financial Instruments Directive II",
+        "category": "Financial Markets",
+        "source_system": "EUR-Lex",
+        "source_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32014L0065",
+        "file_format": "pdf",
+        "file_name": "32014L0065_MiFID_II_EN.pdf",
+        "method": "manual",
     },
     {
         "document_id": "32024R1689",
         "celex": "32024R1689",
         "short_title": "AI_Act",
-        "regulation_title": "Artificial Intelligence Act",
-        "description": "Regulation laying down harmonised rules on artificial intelligence.",
-        "issuing_authority": "European Parliament and Council of the European Union",
-        "regulation_category": "Artificial Intelligence",
-        "compliance_domain": "AI Governance and Risk Management",
-        "document_type": "Regulation",
-        "language": "EN",
-        "formats": ["pdf", "html", "xml"],
+        "title": "Artificial Intelligence Act",
+        "category": "Artificial Intelligence",
+        "source_system": "EUR-Lex",
+        "source_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L_202401689",
+        "file_format": "pdf",
+        "file_name": "32024R1689_AI_Act_EN.pdf",
+        "method": "manual",
+    },
+    {
+        "document_id": "eba_loan_origination_guidelines_html",
+        "celex": None,
+        "short_title": "EBA_Loan_Origination",
+        "title": "EBA Guidelines on Loan Origination and Monitoring",
+        "category": "Credit Risk",
+        "source_system": "EBA",
+        "source_url": (
+            "https://www.eba.europa.eu/activities/single-rulebook/"
+            "regulatory-activities/credit-risk/"
+            "guidelines-loan-origination-and-monitoring"
+        ),
+        "file_format": "html",
+        "file_name": "eba_loan_origination_guidelines_html.html",
+        "method": "download",
+    },
+    {
+        "document_id": "ecb_eurofxref_daily_xml",
+        "celex": None,
+        "short_title": "ECB_Exchange_Rates",
+        "title": "ECB Euro Foreign Exchange Reference Rates",
+        "category": "Financial Markets",
+        "source_system": "ECB",
+        "source_url": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml",
+        "file_format": "xml",
+        "file_name": "ecb_eurofxref_daily_xml.xml",
+        "method": "download",
     },
 ]
 
 
-def create_session() -> requests.Session:
-    """
-    Create a requests session with retry logic.
-
-    This helps with temporary network failures, rate limits,
-    and unstable source responses.
-    """
-
-    retry_strategy = Retry(
-        total=3,
-        backoff_factor=2,
-        status_forcelist=[429, 500, 502, 503, 504],
-        allowed_methods=["GET"],
-    )
-
-    adapter = HTTPAdapter(max_retries=retry_strategy)
-
-    session = requests.Session()
-    session.mount("https://", adapter)
-    session.mount("http://", adapter)
-
-    session.headers.update(
-        {
-            "User-Agent": "AI-Regulatory-Compliance-Assistant/1.0",
-        }
-    )
-
-    return session
+def now_utc() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
-def build_eurlex_url(
-    celex_id: str,
-    language: str,
-    file_format: str,
-) -> str:
-    """
-    Build EUR-Lex URL for a specific CELEX document and format.
+def sha256_file(path: Path) -> str:
+    hasher = hashlib.sha256()
 
-    Examples:
-        PDF:
-        https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679&from=EN
+    with path.open("rb") as file:
+        for chunk in iter(lambda: file.read(1024 * 1024), b""):
+            hasher.update(chunk)
 
-        HTML:
-        https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0679&from=EN
-
-        XML:
-        https://eur-lex.europa.eu/legal-content/EN/TXT/XML/?uri=CELEX:32016R0679&from=EN
-    """
-
-    format_map = {
-        "pdf": "PDF",
-        "html": "HTML",
-        "xml": "XML",
-    }
-
-    if file_format not in format_map:
-        raise ValueError(f"Unsupported EUR-Lex format: {file_format}")
-
-    eurlex_format = format_map[file_format]
-
-    return (
-        f"https://eur-lex.europa.eu/legal-content/{language}/TXT/{eurlex_format}/"
-        f"?uri=CELEX:{celex_id}&from={language}"
-    )
+    return hasher.hexdigest()
 
 
-def get_file_extension(file_format: str) -> str:
-    """
-    Return file extension for each supported format.
-    """
+def validate_file(path: Path, file_format: str) -> None:
+    content = path.read_bytes().lstrip()
 
-    extension_map = {
-        "pdf": ".pdf",
-        "html": ".html",
-        "xml": ".xml",
-        "json": ".json",
-    }
+    if file_format == "pdf" and not content.startswith(b"%PDF"):
+        raise ValueError(f"Invalid PDF file: {path}")
 
-    if file_format not in extension_map:
-        raise ValueError(f"No extension configured for format: {file_format}")
+    if file_format == "html" and b"<html" not in content[:2000].lower():
+        raise ValueError(f"Invalid HTML file: {path}")
 
-    return extension_map[file_format]
+    if file_format == "xml" and not content.startswith(b"<?xml"):
+        raise ValueError(f"Invalid XML file: {path}")
 
 
-def get_accept_header(file_format: str) -> str:
-    """
-    Return the correct HTTP Accept header based on format.
-    """
-
-    accept_map = {
-        "pdf": "application/pdf",
-        "html": "text/html",
-        "xml": "application/xml,text/xml",
-        "json": "application/json",
-    }
-
-    return accept_map.get(file_format, "*/*")
-
-
-def validate_downloaded_content(
-    content: bytes,
-    file_format: str,
-) -> bool:
-    """
-    Basic validation to make sure the downloaded file matches the expected format.
-    """
-
-    stripped = content.lstrip()
-
+def output_dir_for(file_format: str) -> Path:
     if file_format == "pdf":
-        return stripped.startswith(b"%PDF")
+        return PDF_DIR
 
     if file_format == "html":
-        return b"<html" in stripped[:1000].lower() or b"<!doctype html" in stripped[:1000].lower()
+        return HTML_DIR
 
     if file_format == "xml":
-        return stripped.startswith(b"<?xml") or b"<" in stripped[:200]
+        return XML_DIR
 
-    if file_format == "json":
-        return stripped.startswith(b"{") or stripped.startswith(b"[")
-
-    return True
+    raise ValueError(f"Unsupported file format: {file_format}")
 
 
-def calculate_sha256(file_path: Path) -> str:
-    """
-    Calculate SHA256 hash for lineage, deduplication, and traceability.
-    """
-
-    sha256 = hashlib.sha256()
-
-    with file_path.open("rb") as file:
-        for block in iter(lambda: file.read(1024 * 1024), b""):
-            sha256.update(block)
-
-    return sha256.hexdigest()
-
-
-def download_single_format(
-    session: requests.Session,
-    document: dict[str, Any],
-    file_format: str,
-    base_out_dir: Path = RAW_DATA_DIR,
-) -> dict[str, Any]:
-    """
-    Download one document in one format and return metadata.
-    """
-
-    if file_format not in SUPPORTED_FORMATS:
-        raise ValueError(
-            f"Unsupported format '{file_format}'. "
-            f"Supported formats: {sorted(SUPPORTED_FORMATS)}"
-        )
-
-    celex_id = document["celex"]
-    language = document.get("language", "EN")
-    short_title = document["short_title"]
-
-    source_url = build_eurlex_url(
-        celex_id=celex_id,
-        language=language,
-        file_format=file_format,
+def create_metadata(document: dict[str, Any], file_path: Path) -> dict[str, Any]:
+    acquisition_method = (
+        "manual_browser_download"
+        if document["method"] == "manual"
+        else "automatic_download"
     )
 
-    format_dir = base_out_dir / file_format
-    format_dir.mkdir(parents=True, exist_ok=True)
+    return {
+        "document_id": document["document_id"],
+        "celex": document.get("celex"),
+        "short_title": document["short_title"],
+        "title": document["title"],
+        "category": document["category"],
+        "language": "EN",
+        "source_system": document["source_system"],
+        "source_url": document["source_url"],
+        "file_format": document["file_format"],
+        "file_name": file_path.name,
+        "local_path": str(file_path),
+        "file_size_bytes": file_path.stat().st_size,
+        "sha256": sha256_file(file_path),
+        "downloaded_at_utc": now_utc(),
+        "ingestion_status": "downloaded",
+        "acquisition_method": acquisition_method,
+    }
 
-    extension = get_file_extension(file_format)
 
-    file_name = f"{celex_id}_{short_title}_{language}{extension}"
-    file_path = format_dir / file_name
+def create_failed_metadata(document: dict[str, Any], error: Exception) -> dict[str, Any]:
+    return {
+        "document_id": document["document_id"],
+        "celex": document.get("celex"),
+        "short_title": document["short_title"],
+        "title": document["title"],
+        "category": document["category"],
+        "source_system": document["source_system"],
+        "source_url": document["source_url"],
+        "file_format": document["file_format"],
+        "ingestion_status": "failed",
+        "error": str(error),
+        "downloaded_at_utc": now_utc(),
+    }
 
-    print(f"Downloading {short_title} as {file_format.upper()}")
-    print(f"URL: {source_url}")
+
+def register_manual_pdf(document: dict[str, Any]) -> Path:
+    """
+    Register a manually downloaded EUR-Lex PDF.
+
+    Expected input:
+        data/manual/pdf/<file_name>
+
+    Output copy:
+        data/raw/pdf/<file_name>
+    """
+
+    MANUAL_PDF_DIR.mkdir(parents=True, exist_ok=True)
+    PDF_DIR.mkdir(parents=True, exist_ok=True)
+
+    source_path = MANUAL_PDF_DIR / document["file_name"]
+    target_path = PDF_DIR / document["file_name"]
+
+    if not source_path.exists():
+        raise FileNotFoundError(
+            f"Manual PDF not found: {source_path}\n"
+            f"Download it manually from:\n{document['source_url']}"
+        )
+
+    validate_file(source_path, "pdf")
+
+    shutil.copy2(source_path, target_path)
+
+    return target_path
+
+
+def download_file(document: dict[str, Any]) -> Path:
+    target_dir = output_dir_for(document["file_format"])
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    target_path = target_dir / document["file_name"]
 
     headers = {
-        "Accept": get_accept_header(file_format),
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "*/*",
     }
 
-    response = session.get(
-        source_url,
+    response = requests.get(
+        document["source_url"],
         headers=headers,
         timeout=60,
+        allow_redirects=True,
     )
-
     response.raise_for_status()
 
-    content_type = response.headers.get("Content-Type", "")
+    target_path.write_bytes(response.content)
 
-    if not validate_downloaded_content(response.content, file_format):
-        error_file = format_dir / f"{celex_id}_{short_title}_{language}_ERROR.html"
-        error_file.write_bytes(response.content)
+    validate_file(target_path, document["file_format"])
 
-        raise ValueError(
-            f"Downloaded content for {short_title} does not look like {file_format}. "
-            f"Content-Type: {content_type}. "
-            f"Debug response saved to: {error_file}"
-        )
-
-    file_path.write_bytes(response.content)
-
-    file_size_bytes = file_path.stat().st_size
-    file_sha256 = calculate_sha256(file_path)
-
-    metadata = {
-        "document_id": document["document_id"],
-        "celex": celex_id,
-        "short_title": short_title,
-        "regulation_title": document["regulation_title"],
-        "description": document["description"],
-        "issuing_authority": document["issuing_authority"],
-        "regulation_category": document["regulation_category"],
-        "compliance_domain": document["compliance_domain"],
-        "document_type": document["document_type"],
-        "language": language,
-        "source_system": "EUR-Lex",
-        "source_url": source_url,
-        "file_format": file_format,
-        "local_path": str(file_path),
-        "file_name": file_name,
-        "file_size_bytes": file_size_bytes,
-        "sha256": file_sha256,
-        "downloaded_at_utc": datetime.now(timezone.utc).isoformat(),
-        "content_type": content_type,
-        "ingestion_status": "downloaded",
-    }
-
-    return metadata
+    return target_path
 
 
-def download_document(
-    session: requests.Session,
-    document: dict[str, Any],
-) -> list[dict[str, Any]]:
-    """
-    Download one regulatory document in all requested formats.
-    """
+def acquire_document(document: dict[str, Any]) -> dict[str, Any]:
+    print(f"Processing: {document['short_title']}")
 
-    records = []
+    if document["method"] == "manual":
+        file_path = register_manual_pdf(document)
+    elif document["method"] == "download":
+        file_path = download_file(document)
+    else:
+        raise ValueError(f"Unknown acquisition method: {document['method']}")
 
-    for file_format in document["formats"]:
-        try:
-            metadata = download_single_format(
-                session=session,
-                document=document,
-                file_format=file_format,
-            )
+    print(f"Saved: {file_path}")
 
-            records.append(metadata)
-
-            print(f"Downloaded: {metadata['local_path']}")
-            print(f"SHA256: {metadata['sha256']}")
-            print("-" * 80)
-
-        except Exception as error:
-            failed_record = {
-                "document_id": document["document_id"],
-                "celex": document["celex"],
-                "short_title": document["short_title"],
-                "regulation_title": document["regulation_title"],
-                "source_system": "EUR-Lex",
-                "source_url": build_eurlex_url(
-                    celex_id=document["celex"],
-                    language=document.get("language", "EN"),
-                    file_format=file_format,
-                ),
-                "file_format": file_format,
-                "ingestion_status": "failed",
-                "error": str(error),
-                "downloaded_at_utc": datetime.now(timezone.utc).isoformat(),
-            }
-
-            records.append(failed_record)
-
-            print(f"Failed to download {document['short_title']} as {file_format}: {error}")
-            print("-" * 80)
-
-    return records
+    return create_metadata(document, file_path)
 
 
-def save_manifest(
-    records: list[dict[str, Any]],
-    manifest_path: Path = MANIFEST_PATH,
-) -> None:
-    """
-    Save document metadata manifest as JSON.
-    """
+def save_manifest(records: list[dict[str, Any]]) -> None:
+    METADATA_DIR.mkdir(parents=True, exist_ok=True)
 
-    manifest_path.parent.mkdir(parents=True, exist_ok=True)
-
-    with manifest_path.open("w", encoding="utf-8") as file:
+    with MANIFEST_PATH.open("w", encoding="utf-8") as file:
         json.dump(records, file, indent=4, ensure_ascii=False)
 
-
-def main() -> None:
-    session = create_session()
-    manifest_records: list[dict[str, Any]] = []
-
-    for document in EU_REGULATORY_DOCUMENTS:
-        document_records = download_document(
-            session=session,
-            document=document,
-        )
-
-        manifest_records.extend(document_records)
-
-    save_manifest(manifest_records)
-
-    successful_downloads = [
-        record
-        for record in manifest_records
-        if record["ingestion_status"] == "downloaded"
-    ]
-
-    failed_downloads = [
-        record
-        for record in manifest_records
-        if record["ingestion_status"] == "failed"
-    ]
-
-    print("Download summary")
-    print("=" * 80)
-    print(f"Successful downloads: {len(successful_downloads)}")
-    print(f"Failed downloads: {len(failed_downloads)}")
     print(f"Manifest saved to: {MANIFEST_PATH}")
 
 
+def download_corpus() -> list[dict[str, Any]]:
+    manifest = []
+
+    for document in DOCUMENTS:
+        try:
+            metadata = acquire_document(document)
+        except Exception as error:
+            print(f"Failed: {document['short_title']}")
+            print(f"Reason: {error}")
+            metadata = create_failed_metadata(document, error)
+
+        manifest.append(metadata)
+        print("-" * 80)
+
+    save_manifest(manifest)
+
+    return manifest
+
+
 if __name__ == "__main__":
-    main()
+    download_corpus()

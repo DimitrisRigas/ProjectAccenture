@@ -1,17 +1,22 @@
 """
-Read text from the Bronze pages table, 
-split each page's text into overlapping chunks, 
-and write the results to a new Silver table.
+src/jobs/silver_chunking.py
 
-Input: bronze_document_pages - each row has a 'text' column 
-plus metadata columns (celex, short title, page_number, etc)
+Read extracted text from the Bronze pages table,
+split each page/section into overlapping chunks,
+add stable chunk identifiers,
+and write the results to the Silver Delta table.
 
-Output: silver_document_chunks - many rows per input row, each with a chunk of text
-plus the same metadata carried forward.
+Input:
+    accenture2026dbcks.team4.bronze_document_pages
+
+Output:
+    accenture2026dbcks.team4.silver_document_chunks
 """
+
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.types import ArrayType, StringType
+
 
 CATALOG = "accenture2026dbcks"
 SCHEMA = "team4"
@@ -19,53 +24,86 @@ SCHEMA = "team4"
 BRONZE_PAGES_TABLE = f"{CATALOG}.{SCHEMA}.bronze_document_pages"
 SILVER_CHUNK_TABLE = f"{CATALOG}.{SCHEMA}.silver_document_chunks"
 
-# Chunking parameters (mirrored inside chunk_text_udf for Spark serialization safety)
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 
 
 @F.udf(returnType=ArrayType(StringType()))
 def chunk_text_udf(text):
-    # If string is None, empty, or only white space
+    """
+    Split one text field into overlapping chunks.
+
+    Returns an empty list for null, empty, or whitespace-only text.
+    Spark posexplode will then produce zero rows for that input row.
+    """
+
     if not text or not text.strip():
-        return [] # will produce zero rows in spark
+        return []
+
     from langchain_text_splitters import RecursiveCharacterTextSplitter
+
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200
+        chunk_size=CHUNK_SIZE,
+        chunk_overlap=CHUNK_OVERLAP,
+        separators=[
+            "\n\n",
+            "\n",
+            ". ",
+            "; ",
+            ", ",
+            " ",
+            "",
+        ],
     )
+
     return splitter.split_text(text)
 
 
 def main():
-    # Start a spark session
     spark = SparkSession.builder.getOrCreate()
 
-    # Read input table
-    df = spark.read.table(BRONZE_PAGES_TABLE)
+    bronze_pages = spark.read.table(BRONZE_PAGES_TABLE)
 
-    # Transform the data
-    """
-    SELECT *, posexplode(chunks) AS (chunk_index, chunk_text)
-    FROM (
-        SELECT *, chunk_text_udf(text) AS chunks
-        FROM bronze_document_pages
-    )
-    """
-    silver = (
-        df.withColumn("chunks", chunk_text_udf(F.col("text")))
-        .select('*', F.posexplode("chunks").alias("chunk_index", "chunk_text"))
+    silver_chunks = (
+        bronze_pages
+        .withColumn("chunks", chunk_text_udf(F.col("text")))
+        .select(
+            "*",
+            F.posexplode("chunks").alias("chunk_index", "chunk_text"),
+        )
         .drop("chunks", "text")
+        .withColumn("chunk_text", F.trim(F.col("chunk_text")))
+        .filter(F.col("chunk_text").isNotNull())
+        .filter(F.length(F.col("chunk_text")) > 0)
+        .withColumn("chunk_length", F.length(F.col("chunk_text")))
+        .withColumn(
+            "chunk_id",
+            F.sha2(
+                F.concat_ws(
+                    "_",
+                    F.col("document_id"),
+                    F.coalesce(F.col("page_number").cast("string"), F.lit("no_page")),
+                    F.coalesce(F.col("section_number").cast("string"), F.lit("no_section")),
+                    F.col("chunk_index").cast("string"),
+                ),
+                256,
+            ),
+        )
+        .withColumn("silver_loaded_at", F.current_timestamp())
     )
 
-    # Write the output table
     (
-        silver.write.format("delta")
-            .mode("overwrite")
-            .option("overwriteSchema", "true")
-            .saveAsTable(SILVER_CHUNK_TABLE)
+        silver_chunks.write
+        .format("delta")
+        .mode("overwrite")
+        .option("overwriteSchema", "true")
+        .saveAsTable(SILVER_CHUNK_TABLE)
     )
-    
+
+    print(f"Silver chunks written to: {SILVER_CHUNK_TABLE}")
+    print(f"Chunk size: {CHUNK_SIZE}")
+    print(f"Chunk overlap: {CHUNK_OVERLAP}")
+
 
 if __name__ == "__main__":
     main()
