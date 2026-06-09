@@ -6,5 +6,8 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "databricks-sdk>=0.114.0",
+    "langchain-text-splitters>=1.1.2",
+    "openai>=1.0.0",
+    "python-dotenv>=1.0.0",
     "requests>=2.34.2",
 ]
