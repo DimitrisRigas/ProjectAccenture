@@ -1,17 +1,18 @@
 """
+src/upload_to_volume.py
+
 Upload downloaded EU regulatory documents to a Databricks Unity Catalog Volume.
 
-This script uploads:
-- raw PDF files
-- raw HTML files
-- raw XML files
-- metadata manifest JSON
+Uploads:
+- PDFs from data/raw/pdf/
+- if no raw PDFs exist, PDFs from data/manual/pdf/
+- HTML files from data/raw/html/
+- XML files from data/raw/xml/
+- document manifest from data/metadata/document_manifest.json
 
-Project step:
-    6.5 Databricks & Data Engineering Implementation
-    6.6 AI-Ready Document Processing
-
-file: ex2_upload_to_volume.py
+This supports:
+- Project step 6.5 Databricks & Data Engineering Implementation
+- Project step 6.6 AI-Ready Document Processing
 """
 
 from __future__ import annotations
@@ -21,152 +22,236 @@ from pathlib import Path
 from databricks.sdk import WorkspaceClient
 
 
+# Because this file is located at:
+# ProjectAccenture/src/upload_to_volume.py
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+DATA_DIR = PROJECT_ROOT / "data"
+
+RAW_DIR = DATA_DIR / "raw"
+RAW_PDF_DIR = RAW_DIR / "pdf"
+RAW_HTML_DIR = RAW_DIR / "html"
+RAW_XML_DIR = RAW_DIR / "xml"
+
+MANUAL_PDF_DIR = DATA_DIR / "manual" / "pdf"
+
+METADATA_DIR = DATA_DIR / "metadata"
+MANIFEST_PATH = METADATA_DIR / "document_manifest.json"
+
+
+# Change these 3 values to match your Databricks setup.
 CATALOG = "accenture2026dbcks"
 SCHEMA = "team4"
-VOLUME = "volume"
-
-VOLUME_PATH = f"/Volumes/{CATALOG}/{SCHEMA}/{VOLUME}"
-LOCAL_RAW_DIR = Path("data") / "raw"
-LOCAL_METADATA_DIR = Path("data") / "metadata"
+VOLUME = "data"
 
 
-def get_workspace_client() -> WorkspaceClient:
+DATABRICKS_VOLUME_PATH = f"/Volumes/{CATALOG}/{SCHEMA}/{VOLUME}"
+
+DATABRICKS_RAW_PATH = f"{DATABRICKS_VOLUME_PATH}/raw"
+DATABRICKS_RAW_PDF_PATH = f"{DATABRICKS_RAW_PATH}/pdf"
+DATABRICKS_RAW_HTML_PATH = f"{DATABRICKS_RAW_PATH}/html"
+DATABRICKS_RAW_XML_PATH = f"{DATABRICKS_RAW_PATH}/xml"
+DATABRICKS_METADATA_PATH = f"{DATABRICKS_VOLUME_PATH}/metadata"
+
+
+def get_client() -> WorkspaceClient:
     """
     Create Databricks workspace client.
 
-    Authentication is handled by Databricks SDK.
-    Usually it reads from:
-    - DATABRICKS_HOST
-    - DATABRICKS_TOKEN
-
-    or from an existing Databricks CLI profile.
+    The Databricks SDK reads authentication from:
+    - environment variables, for example DATABRICKS_HOST and DATABRICKS_TOKEN
+    - Databricks CLI configuration
+    - notebook environment, if running inside Databricks
     """
 
     return WorkspaceClient()
 
 
-def upload_file_to_volume(
-    client: WorkspaceClient,
-    local_file: Path,
-    target_file_path: str,
-) -> None:
+def create_volume_folders(client: WorkspaceClient) -> None:
     """
-    Upload one local file to a Databricks Unity Catalog Volume.
+    Create folders in the Unity Catalog Volume.
     """
 
-    with local_file.open("rb") as file:
+    folders = [
+        DATABRICKS_VOLUME_PATH,
+        DATABRICKS_RAW_PATH,
+        DATABRICKS_RAW_PDF_PATH,
+        DATABRICKS_RAW_HTML_PATH,
+        DATABRICKS_RAW_XML_PATH,
+        DATABRICKS_METADATA_PATH,
+    ]
+
+    for folder in folders:
+        try:
+            client.files.create_directory(folder)
+            print(f"Created folder: {folder}")
+        except Exception:
+            print(f"Folder already exists or could not be created: {folder}")
+
+
+def upload_file(
+    client: WorkspaceClient,
+    local_path: Path,
+    target_folder: str,
+) -> None:
+    """
+    Upload one file to a Databricks Unity Catalog Volume.
+    """
+
+    if not local_path.exists():
+        raise FileNotFoundError(f"Local file not found: {local_path}")
+
+    target_path = f"{target_folder}/{local_path.name}"
+    file_size_mb = local_path.stat().st_size / (1024 * 1024)
+
+    print(f"Uploading: {local_path}")
+    print(f"Size: {file_size_mb:.2f} MB")
+    print(f"Target: {target_path}")
+
+    with local_path.open("rb") as file:
         client.files.upload(
-            file_path=target_file_path,
+            file_path=target_path,
             contents=file,
             overwrite=True,
         )
 
-    print(f"Uploaded: {local_file} -> {target_file_path}")
+    print("Upload completed")
+    print("-" * 80)
 
 
-def upload_directory_files(
+def upload_folder(
     client: WorkspaceClient,
-    local_directory: Path,
-    volume_subdirectory: str,
+    local_folder: Path,
+    target_folder: str,
     pattern: str,
 ) -> int:
     """
-    Upload files from one local directory to one Volume subdirectory.
+    Upload all files matching a pattern from a local folder.
     """
 
-    if not local_directory.exists():
-        print(f"Skipping missing folder: {local_directory}")
+    if not local_folder.exists():
+        print(f"Skipping missing folder: {local_folder}")
         return 0
 
-    files = sorted(local_directory.glob(pattern))
+    files = sorted(local_folder.glob(pattern))
 
     if not files:
-        print(f"No files found in: {local_directory}")
+        print(f"No files found in: {local_folder}")
         return 0
 
     uploaded_count = 0
 
-    for local_file in files:
-        target_file_path = (
-            f"{VOLUME_PATH}/{volume_subdirectory}/{local_file.name}"
-        )
-
-        upload_file_to_volume(
+    for file_path in files:
+        upload_file(
             client=client,
-            local_file=local_file,
-            target_file_path=target_file_path,
+            local_path=file_path,
+            target_folder=target_folder,
         )
-
         uploaded_count += 1
 
     return uploaded_count
 
 
+def choose_pdf_folder() -> Path:
+    """
+    Prefer data/raw/pdf/.
+
+    If raw PDFs do not exist, fallback to data/manual/pdf/.
+    This is useful when EUR-Lex PDFs were manually downloaded.
+    """
+
+    raw_pdfs = list(RAW_PDF_DIR.glob("*.pdf")) if RAW_PDF_DIR.exists() else []
+
+    if raw_pdfs:
+        print(f"Using raw PDF folder: {RAW_PDF_DIR}")
+        return RAW_PDF_DIR
+
+    manual_pdfs = list(MANUAL_PDF_DIR.glob("*.pdf")) if MANUAL_PDF_DIR.exists() else []
+
+    if manual_pdfs:
+        print(f"No raw PDFs found in: {RAW_PDF_DIR}")
+        print(f"Using manual PDF folder instead: {MANUAL_PDF_DIR}")
+        return MANUAL_PDF_DIR
+
+    print(f"No PDFs found in: {RAW_PDF_DIR}")
+    print(f"No PDFs found in: {MANUAL_PDF_DIR}")
+
+    return RAW_PDF_DIR
+
+
 def upload_manifest(client: WorkspaceClient) -> int:
     """
-    Upload metadata manifest JSON to the Volume.
+    Upload document_manifest.json if it exists.
     """
 
-    manifest_path = LOCAL_METADATA_DIR / "document_manifest.json"
-
-    if not manifest_path.exists():
-        print(f"Manifest not found: {manifest_path}")
-        print("Run ex1_download_documents.py first.")
+    if not MANIFEST_PATH.exists():
+        print(f"Manifest not found: {MANIFEST_PATH}")
+        print("Run downloader.py first.")
         return 0
 
-    target_file_path = f"{VOLUME_PATH}/metadata/{manifest_path.name}"
-
-    upload_file_to_volume(
+    upload_file(
         client=client,
-        local_file=manifest_path,
-        target_file_path=target_file_path,
+        local_path=MANIFEST_PATH,
+        target_folder=DATABRICKS_METADATA_PATH,
     )
 
     return 1
 
 
 def main() -> None:
-    if not LOCAL_RAW_DIR.exists():
+    """
+    Main upload workflow.
+    """
+
+    if not RAW_DIR.exists() and not MANUAL_PDF_DIR.exists():
         raise FileNotFoundError(
-            f"Folder not found: {LOCAL_RAW_DIR}. "
-            "Run ex1_download_documents.py first."
+            "No local data found.\n"
+            f"Expected raw folder: {RAW_DIR}\n"
+            f"Expected manual PDF folder: {MANUAL_PDF_DIR}\n"
+            "Run downloader.py first or place PDFs in data/manual/pdf/."
         )
 
-    client = get_workspace_client()
+    print("=" * 80)
+    print("Uploading regulatory files to Databricks Unity Catalog Volume")
+    print("=" * 80)
+    print(f"Target volume: {DATABRICKS_VOLUME_PATH}")
+    print("=" * 80)
 
-    print("Uploading files to Databricks Volume")
-    print("=" * 80)
-    print(f"Target Volume path: {VOLUME_PATH}")
-    print("=" * 80)
+    client = get_client()
+    create_volume_folders(client)
 
     total_uploaded = 0
 
-    total_uploaded += upload_directory_files(
+    pdf_folder = choose_pdf_folder()
+
+    total_uploaded += upload_folder(
         client=client,
-        local_directory=LOCAL_RAW_DIR / "pdf",
-        volume_subdirectory="raw/pdf",
+        local_folder=pdf_folder,
+        target_folder=DATABRICKS_RAW_PDF_PATH,
         pattern="*.pdf",
     )
 
-    total_uploaded += upload_directory_files(
+    total_uploaded += upload_folder(
         client=client,
-        local_directory=LOCAL_RAW_DIR / "html",
-        volume_subdirectory="raw/html",
+        local_folder=RAW_HTML_DIR,
+        target_folder=DATABRICKS_RAW_HTML_PATH,
         pattern="*.html",
     )
 
-    total_uploaded += upload_directory_files(
+    total_uploaded += upload_folder(
         client=client,
-        local_directory=LOCAL_RAW_DIR / "xml",
-        volume_subdirectory="raw/xml",
+        local_folder=RAW_XML_DIR,
+        target_folder=DATABRICKS_RAW_XML_PATH,
         pattern="*.xml",
     )
 
     total_uploaded += upload_manifest(client)
 
     print("=" * 80)
-    print(f"Upload completed. Total uploaded files: {total_uploaded}")
-    print(f"Databricks Volume path: {VOLUME_PATH}")
+    print("Upload completed")
+    print(f"Total uploaded files: {total_uploaded}")
+    print(f"Databricks volume path: {DATABRICKS_VOLUME_PATH}")
+    print("=" * 80)
 
 
 if __name__ == "__main__":

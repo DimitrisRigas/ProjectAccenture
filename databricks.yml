@@ -4,6 +4,18 @@ bundle:
 include:
   - resources/*.yml
 
+sync:
+  include:
+    - src/**
+    - resources/**
+  exclude:
+    - .venv/**
+    - __pycache__/**
+    - .pytest_cache/**
+    - data/**
+    - chroma_db/**
+    - .env
+
 targets:
   dev:
     default: true

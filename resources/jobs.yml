@@ -1,15 +1,41 @@
 resources:
   jobs:
-    bronze_ingestion_job:
-      name: regulatory_compliance_bronze_ingestion
+    regulatory_compliance_pipeline:
+      name: regulatory_compliance_pipeline
 
       tasks:
         - task_key: bronze_ingestion
-
           spark_python_task:
             python_file: ../src/jobs/bronze_ingestion.py
-
           environment_key: bronze_environment
+
+        - task_key: silver_chunking
+          depends_on:
+            - task_key: bronze_ingestion
+          spark_python_task:
+            python_file: ../src/jobs/silver_chunking.py
+          environment_key: silver_environment
+
+        - task_key: gold_embeddings
+          depends_on:
+            - task_key: silver_chunking
+          spark_python_task:
+            python_file: ../src/jobs/gold_embeddings.py
+          environment_key: gold_environment
+
+        - task_key: create_azure_search_index
+          depends_on:
+            - task_key: gold_embeddings
+          spark_python_task:
+            python_file: ../src/jobs/create_azure_search_index.py
+          environment_key: azure_search_environment
+
+        - task_key: upload_gold_to_azure_search
+          depends_on:
+            - task_key: create_azure_search_index
+          spark_python_task:
+            python_file: ../src/jobs/upload_gold_to_azure_search.py
+          environment_key: azure_search_environment
 
       environments:
         - environment_key: bronze_environment
@@ -18,21 +44,43 @@ resources:
             dependencies:
               - pymupdf
               - beautifulsoup4
+              - python-dotenv
 
-    silver_chunking_job:
-      name: regulatory_compliance_silver_chunking
-
-      tasks:
-        - task_key: silver_chunking
-
-          spark_python_task:
-            python_file: ../src/jobs/silver_chunking.py
-
-          environment_key: silver_environment
-
-      environments:
         - environment_key: silver_environment
           spec:
             client: "2"
             dependencies:
               - langchain-text-splitters
+              - python-dotenv
+
+        - environment_key: gold_environment
+          spec:
+            client: "2"
+            dependencies:
+              - python-dotenv
+
+        - environment_key: azure_search_environment
+          spec:
+            client: "2"
+            dependencies:
+              - openai
+              - azure-core
+              - azure-search-documents
+              - python-dotenv
+              - databricks-sdk
+
+    test_vector_search:
+      name: test_vector_search
+
+      tasks:
+        - task_key: test_vector_search
+          spark_python_task:
+            python_file: ../src/jobs/test_vector_search.py
+          environment_key: vector_search_environment
+
+      environments:
+        - environment_key: vector_search_environment
+          spec:
+            client: "2"
+            dependencies:
+              - databricks-vectorsearch
