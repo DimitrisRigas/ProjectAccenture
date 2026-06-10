@@ -141,9 +141,11 @@ ProjectAccenture/
 │   ├── downloader.py
 │   ├── rag_service.py
 │   └── uploader.py
-│
+├── Dockerfile
+├── docker-compose.yml
+├── .dockerignore
 ├── databricks.yml
-├── pyproject.toml
+├── pyproject.toml   
 ├── uv.lock
 └── README.md
 ```
@@ -649,6 +651,97 @@ http://127.0.0.1:8000/ask
 ```
 
 ---
+## Running with Docker
+
+The local application layer can also be run with Docker.
+
+Docker is used for the FastAPI backend, RAG service, API key authentication, and PII redaction layer. The cloud services remain external managed services:
+
+* Databricks workflows remain in Databricks.
+* Azure OpenAI remains an external Azure service.
+* Azure AI Search remains an external Azure service.
+* Unity Catalog Volumes and Delta tables remain in Databricks.
+
+The Docker container runs the local API layer and connects to Azure OpenAI and Azure AI Search using environment variables.
+
+### Dockerized Components
+
+The Docker container includes:
+
+* FastAPI backend
+* `/ask` endpoint
+* RAG service
+* Azure AI Search retrieval client
+* Azure OpenAI client
+* PII redaction logic
+* API key authentication
+
+### Files
+
+Docker configuration is defined in:
+
+```text
+Dockerfile
+docker-compose.yml
+.dockerignore
+```
+
+### Run with Docker Compose
+
+From the project root, run:
+
+```powershell
+docker compose up --build
+```
+
+The API will be available at:
+
+```text
+http://127.0.0.1:8000
+```
+
+Swagger documentation is available at:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### Test the Dockerized API
+
+```powershell
+curl -X POST "http://127.0.0.1:8000/ask" `
+  -H "Content-Type: application/json" `
+  -H "X-API-Key: demo-secret-key" `
+  -d "{\"question\":\"According to GDPR, what obligations do controllers have for personal data protection?\",\"top_k\":5}"
+```
+
+### Test with the Frontend
+
+After Docker is running, open:
+
+```text
+src/frontend/index.html
+```
+
+Then ask:
+
+```text
+According to GDPR, what obligations do controllers have for personal data protection?
+```
+
+If the frontend returns an answer with retrieved sources, the Dockerized API is working correctly.
+
+### Stop Docker
+
+```powershell
+docker compose down
+```
+
+### Notes
+
+The `.env` file is loaded at runtime through Docker Compose. It is not copied into the Docker image and must not be committed to Git.
+
+This setup Dockerizes the local application layer only. Databricks and Azure services are intentionally kept as external cloud services.
 
 ## 11. Example API Request
 
