@@ -42,7 +42,7 @@ MANIFEST_PATH = METADATA_DIR / "document_manifest.json"
 # Change these 3 values to match your Databricks setup.
 CATALOG = "accenture2026dbcks"
 SCHEMA = "team4"
-VOLUME = "data"
+VOLUME = "volume"
 
 
 DATABRICKS_VOLUME_PATH = f"/Volumes/{CATALOG}/{SCHEMA}/{VOLUME}"

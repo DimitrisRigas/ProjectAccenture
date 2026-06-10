@@ -13,7 +13,7 @@
         "local_path": "C:\\Users\\mitso\\TrainingAcademy\\ProjectAccenture\\ProjectAccenture\\data\\raw\\pdf\\32016R0679_GDPR_EN.pdf",
         "file_size_bytes": 982296,
         "sha256": "bd84e63f5b622b739a83389afc3b30d240f792bb88d8eb03a816c9a82b0c2499",
-        "downloaded_at_utc": "2026-06-09T08:44:52.948018+00:00",
+        "downloaded_at_utc": "2026-06-10T08:30:37.110477+00:00",
         "ingestion_status": "downloaded",
         "acquisition_method": "manual_browser_download"
     },
@@ -31,7 +31,7 @@
         "local_path": "C:\\Users\\mitso\\TrainingAcademy\\ProjectAccenture\\ProjectAccenture\\data\\raw\\pdf\\32022R2554_DORA_EN.pdf",
         "file_size_bytes": 1493241,
         "sha256": "85307f9e2a0409826dd0f54489645935816d16e929f0db4db3ef15badd11d38c",
-        "downloaded_at_utc": "2026-06-09T08:44:52.951709+00:00",
+        "downloaded_at_utc": "2026-06-10T08:30:37.115502+00:00",
         "ingestion_status": "downloaded",
         "acquisition_method": "manual_browser_download"
     },
@@ -49,7 +49,7 @@
         "local_path": "C:\\Users\\mitso\\TrainingAcademy\\ProjectAccenture\\ProjectAccenture\\data\\raw\\pdf\\32015L2366_PSD2_EN.pdf",
         "file_size_bytes": 1467309,
         "sha256": "adb1a81b9cecaf8caba510cf4c84b93bf607c7ccef6475777e981c957fae851b",
-        "downloaded_at_utc": "2026-06-09T08:44:52.956542+00:00",
+        "downloaded_at_utc": "2026-06-10T08:30:37.121850+00:00",
         "ingestion_status": "downloaded",
         "acquisition_method": "manual_browser_download"
     },
@@ -67,7 +67,7 @@
         "local_path": "C:\\Users\\mitso\\TrainingAcademy\\ProjectAccenture\\ProjectAccenture\\data\\raw\\pdf\\32014L0065_MiFID_II_EN.pdf",
         "file_size_bytes": 1809981,
         "sha256": "28dfda0f6a6539b664f823d42041f6bc2a989734d065b9cce0257a991c1a6338",
-        "downloaded_at_utc": "2026-06-09T08:44:52.960719+00:00",
+        "downloaded_at_utc": "2026-06-10T08:30:37.129303+00:00",
         "ingestion_status": "downloaded",
         "acquisition_method": "manual_browser_download"
     },
@@ -85,7 +85,7 @@
         "local_path": "C:\\Users\\mitso\\TrainingAcademy\\ProjectAccenture\\ProjectAccenture\\data\\raw\\pdf\\32024R1689_AI_Act_EN.pdf",
         "file_size_bytes": 2583319,
         "sha256": "bba630444b3278e881066774002a1d7824308934f49ccfa203e65be43692f55e",
-        "downloaded_at_utc": "2026-06-09T08:44:52.966092+00:00",
+        "downloaded_at_utc": "2026-06-10T08:30:37.138380+00:00",
         "ingestion_status": "downloaded",
         "acquisition_method": "manual_browser_download"
     },
@@ -101,9 +101,9 @@
         "file_format": "html",
         "file_name": "eba_loan_origination_guidelines_html.html",
         "local_path": "C:\\Users\\mitso\\TrainingAcademy\\ProjectAccenture\\ProjectAccenture\\data\\raw\\html\\eba_loan_origination_guidelines_html.html",
-        "file_size_bytes": 93973,
-        "sha256": "64205d6e5a524b469a01788d0ae37631cf4deb96a333cca38770d07d54a00c4f",
-        "downloaded_at_utc": "2026-06-09T08:44:53.369075+00:00",
+        "file_size_bytes": 93967,
+        "sha256": "d25e29da2771b1df2bdcf18559f5e1aa2d0d6e1275a0aa6e367bf17dc615184e",
+        "downloaded_at_utc": "2026-06-10T08:30:37.594088+00:00",
         "ingestion_status": "downloaded",
         "acquisition_method": "automatic_download"
     },
@@ -120,8 +120,8 @@
         "file_name": "ecb_eurofxref_daily_xml.xml",
         "local_path": "C:\\Users\\mitso\\TrainingAcademy\\ProjectAccenture\\ProjectAccenture\\data\\raw\\xml\\ecb_eurofxref_daily_xml.xml",
         "file_size_bytes": 1547,
-        "sha256": "8b42c6d5a0c6bebff79417a5bc426b2dc445020d745bf493e9c855cefbd4d9a5",
-        "downloaded_at_utc": "2026-06-09T08:44:53.593942+00:00",
+        "sha256": "3de81739bbbae8ff4173b4c85d59bc78109fbcbd07d20ce3e5be1a05c9615e6e",
+        "downloaded_at_utc": "2026-06-10T08:30:37.821224+00:00",
         "ingestion_status": "downloaded",
         "acquisition_method": "automatic_download"
     }
