@@ -1,0 +1,50 @@
+[
+  {
+    "id": "q1",
+    "question": "According to GDPR, what obligations do controllers have for personal data protection?",
+    "expected_regulation": "GDPR",
+    "expected_keywords": ["controller", "personal data", "processing", "measures"]
+  },
+  {
+    "id": "q2",
+    "question": "What does DORA require from financial entities?",
+    "expected_regulation": "DORA",
+    "expected_keywords": ["financial entities", "ICT", "risk", "resilience"]
+  },
+  {
+    "id": "q3",
+    "question": "What is the purpose of PSD2?",
+    "expected_regulation": "PSD2",
+    "expected_keywords": ["payment", "services", "security", "consumer"]
+  },
+  {
+    "id": "q4",
+    "question": "How does MiFID II relate to investor protection?",
+    "expected_regulation": "MiFID_II",
+    "expected_keywords": ["investor", "protection", "investment", "services"]
+  },
+  {
+    "id": "q5",
+    "question": "What are the risk management ideas in the EU AI Act?",
+    "expected_regulation": "AI_Act",
+    "expected_keywords": ["risk", "AI", "system", "management"]
+  },
+  {
+    "id": "q6",
+    "question": "What does GDPR say about data subject rights?",
+    "expected_regulation": "GDPR",
+    "expected_keywords": ["data subject", "rights", "personal data", "controller"]
+  },
+  {
+    "id": "q7",
+    "question": "What kind of operational resilience does DORA focus on?",
+    "expected_regulation": "DORA",
+    "expected_keywords": ["operational resilience", "ICT", "risk", "financial"]
+  },
+  {
+    "id": "q8",
+    "question": "What does the AI Act say about high-risk AI systems?",
+    "expected_regulation": "AI_Act",
+    "expected_keywords": ["high-risk", "AI systems", "requirements", "risk"]
+  }
+]

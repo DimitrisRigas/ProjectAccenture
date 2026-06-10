@@ -1075,7 +1075,7 @@
     <script>
         const API_BASE_URL = "http://127.0.0.1:8000";
         const QUERY_URL = `${API_BASE_URL}/ask`;
-
+        const APP_API_KEY = "demo-secret-key";  
         const questionInput = document.getElementById("questionInput");
         const askBtn = document.getElementById("askBtn");
         const answerBox = document.getElementById("answerBox");
@@ -1170,7 +1170,8 @@
                 const response = await fetch(QUERY_URL, {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
+                         "Content-Type": "application/json",
+                         "X-API-Key": APP_API_KEY,
                     },
                     body: JSON.stringify({
                         question: question,

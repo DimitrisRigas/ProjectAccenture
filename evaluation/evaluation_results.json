@@ -1,0 +1,321 @@
+{
+  "evaluation_timestamp": "2026-06-09T18:24:05.209033Z",
+  "top_k": 5,
+  "summary": {
+    "total_questions": 8,
+    "passed_questions": 8,
+    "pass_rate": 1.0,
+    "questions_with_sources": 8,
+    "expected_regulation_found_count": 8,
+    "top_source_matches_expected_count": 8,
+    "average_keyword_coverage": 0.938
+  },
+  "results": [
+    {
+      "id": "q1",
+      "question": "According to GDPR, what obligations do controllers have for personal data protection?",
+      "passed": true,
+      "has_sources": true,
+      "num_sources": 5,
+      "average_retrieval_score": 0.024582,
+      "regulation_check": {
+        "expected_regulation": "GDPR",
+        "retrieved_source_titles": [
+          "GDPR",
+          "GDPR",
+          "GDPR",
+          "GDPR",
+          "GDPR"
+        ],
+        "expected_regulation_found": true,
+        "top_source_title": "GDPR",
+        "top_source_matches_expected": true
+      },
+      "keyword_check": {
+        "expected_keywords": [
+          "controller",
+          "personal data",
+          "processing",
+          "measures"
+        ],
+        "found_keywords": [
+          "controller",
+          "personal data",
+          "processing",
+          "measures"
+        ],
+        "missing_keywords": [],
+        "keyword_coverage": 1.0
+      },
+      "answer_preview": "According to the GDPR, controllers have several obligations for personal data protection:\n\n- Controllers are responsible and liable for any processing of personal data they carry out or that is carried out on their behalf. They must implement appropriate and effective measures to ensure and demonstrate compliance with the GDPR. These measures should consider the nature, scope, context, and purposes of the processing, as well as the risks to the rights and freedoms of individuals [Source 5, page 14].\n\n- Controllers must maintain records of processing activities under their responsibility and cooperate with supervisory authorities by making these records available upon request. This helps with"
+    },
+    {
+      "id": "q2",
+      "question": "What does DORA require from financial entities?",
+      "passed": true,
+      "has_sources": true,
+      "num_sources": 5,
+      "average_retrieval_score": 0.01984,
+      "regulation_check": {
+        "expected_regulation": "DORA",
+        "retrieved_source_titles": [
+          "DORA",
+          "DORA",
+          "DORA",
+          "MiFID_II",
+          "PSD2"
+        ],
+        "expected_regulation_found": true,
+        "top_source_title": "DORA",
+        "top_source_matches_expected": true
+      },
+      "keyword_check": {
+        "expected_keywords": [
+          "financial entities",
+          "ICT",
+          "risk",
+          "resilience"
+        ],
+        "found_keywords": [
+          "financial entities",
+          "ICT",
+          "risk",
+          "resilience"
+        ],
+        "missing_keywords": [],
+        "keyword_coverage": 1.0
+      },
+      "answer_preview": "DORA (Digital Operational Resilience Act) requires financial entities to increase their operational resilience. The regulation sets out requirements that are proportionate to the size, risk profile, nature, scale, and complexity of the financial entity’s services, activities, and operations. For example, microenterprises and entities subject to a simplified ICT risk management framework may have tailored requirements. Supervisory activities should focus on these factors to ensure efficient and proportionate oversight [Source 1].\n\nDORA also aims to reduce administrative burdens and duplicative reporting obligations, particularly for payment service providers, by streamlining incident reportin"
+    },
+    {
+      "id": "q3",
+      "question": "What is the purpose of PSD2?",
+      "passed": true,
+      "has_sources": true,
+      "num_sources": 5,
+      "average_retrieval_score": 0.017089,
+      "regulation_check": {
+        "expected_regulation": "PSD2",
+        "retrieved_source_titles": [
+          "PSD2",
+          "PSD2",
+          "AI_Act",
+          "PSD2",
+          "AI_Act"
+        ],
+        "expected_regulation_found": true,
+        "top_source_title": "PSD2",
+        "top_source_matches_expected": true
+      },
+      "keyword_check": {
+        "expected_keywords": [
+          "payment",
+          "services",
+          "security",
+          "consumer"
+        ],
+        "found_keywords": [
+          "payment",
+          "services",
+          "security"
+        ],
+        "missing_keywords": [
+          "consumer"
+        ],
+        "keyword_coverage": 0.75
+      },
+      "answer_preview": "The purpose of PSD2 (Payment Services Directive 2) is to establish a clear and harmonised regulatory framework for payment services across the EU. It aims to ensure continuity in the market by enabling both existing and new service providers to offer their services under fair competition, while also ensuring the security of payment transactions and protecting customers against fraud. PSD2 sets out rules for the different categories of payment service providers and introduces requirements for secure communication and authentication between providers and users [Source 2], [Source 4]."
+    },
+    {
+      "id": "q4",
+      "question": "How does MiFID II relate to investor protection?",
+      "passed": true,
+      "has_sources": true,
+      "num_sources": 5,
+      "average_retrieval_score": 0.024789,
+      "regulation_check": {
+        "expected_regulation": "MiFID_II",
+        "retrieved_source_titles": [
+          "MiFID_II",
+          "MiFID_II",
+          "MiFID_II",
+          "MiFID_II",
+          "MiFID_II"
+        ],
+        "expected_regulation_found": true,
+        "top_source_title": "MiFID_II",
+        "top_source_matches_expected": true
+      },
+      "keyword_check": {
+        "expected_keywords": [
+          "investor",
+          "protection",
+          "investment",
+          "services"
+        ],
+        "found_keywords": [
+          "investor",
+          "protection",
+          "investment"
+        ],
+        "missing_keywords": [
+          "services"
+        ],
+        "keyword_coverage": 0.75
+      },
+      "answer_preview": "MiFID II (Markets in Financial Instruments Directive II) is closely related to investor protection. One of its main objectives is to protect investors by ensuring that investment firms act honestly, fairly, and professionally with all categories of clients (retail, professional, and counterparties). MiFID II requires that communications with clients are fair, clear, and not misleading, and it adapts investor protection measures to the specific needs of different investor categories [Source 5].\n\nAdditionally, MiFID II strengthens the regulatory framework to increase transparency, better protect investors, and reinforce confidence in financial markets. It also includes requirements for the pro"
+    },
+    {
+      "id": "q5",
+      "question": "What are the risk management ideas in the EU AI Act?",
+      "passed": true,
+      "has_sources": true,
+      "num_sources": 5,
+      "average_retrieval_score": 0.024768,
+      "regulation_check": {
+        "expected_regulation": "AI_Act",
+        "retrieved_source_titles": [
+          "AI_Act",
+          "AI_Act",
+          "AI_Act",
+          "AI_Act",
+          "AI_Act"
+        ],
+        "expected_regulation_found": true,
+        "top_source_title": "AI_Act",
+        "top_source_matches_expected": true
+      },
+      "keyword_check": {
+        "expected_keywords": [
+          "risk",
+          "AI",
+          "system",
+          "management"
+        ],
+        "found_keywords": [
+          "risk",
+          "AI",
+          "system",
+          "management"
+        ],
+        "missing_keywords": [],
+        "keyword_coverage": 1.0
+      },
+      "answer_preview": "The EU AI Act sets out several risk management ideas, especially for high-risk AI systems. According to Article 9, a risk management system must be established, implemented, documented, and maintained throughout the entire lifecycle of a high-risk AI system. This system is a continuous, iterative process that involves regular and systematic review and updating. Key steps include:\n\n- Identifying and analyzing known and reasonably foreseeable risks to health, safety, or fundamental rights when the AI system is used as intended.\n- Estimating and evaluating the risks that may emerge during intended use.\n\nThe risk management system must be integrated into existing documentation and procedures req"
+    },
+    {
+      "id": "q6",
+      "question": "What does GDPR say about data subject rights?",
+      "passed": true,
+      "has_sources": true,
+      "num_sources": 5,
+      "average_retrieval_score": 0.023884,
+      "regulation_check": {
+        "expected_regulation": "GDPR",
+        "retrieved_source_titles": [
+          "GDPR",
+          "GDPR",
+          "GDPR",
+          "GDPR",
+          "GDPR"
+        ],
+        "expected_regulation_found": true,
+        "top_source_title": "GDPR",
+        "top_source_matches_expected": true
+      },
+      "keyword_check": {
+        "expected_keywords": [
+          "data subject",
+          "rights",
+          "personal data",
+          "controller"
+        ],
+        "found_keywords": [
+          "data subject",
+          "rights",
+          "personal data",
+          "controller"
+        ],
+        "missing_keywords": [],
+        "keyword_coverage": 1.0
+      },
+      "answer_preview": "The GDPR provides several key rights for data subjects regarding their personal data:\n\n- Right of access: Data subjects have the right to obtain confirmation from the controller as to whether their personal data is being processed, and, if so, access to that data and information such as the purposes of processing, categories of data, recipients, storage periods, and the existence of other rights (rectification, erasure, restriction, objection, and the right to lodge a complaint) [Source 4, page 43].\n\n- Right to rectification: Data subjects can request the correction of inaccurate personal data concerning them [Source 2, page 12].\n\n- Right to erasure (“right to be forgotten”): Data subjects c"
+    },
+    {
+      "id": "q7",
+      "question": "What kind of operational resilience does DORA focus on?",
+      "passed": true,
+      "has_sources": true,
+      "num_sources": 5,
+      "average_retrieval_score": 0.029774,
+      "regulation_check": {
+        "expected_regulation": "DORA",
+        "retrieved_source_titles": [
+          "DORA",
+          "DORA",
+          "DORA",
+          "DORA",
+          "DORA"
+        ],
+        "expected_regulation_found": true,
+        "top_source_title": "DORA",
+        "top_source_matches_expected": true
+      },
+      "keyword_check": {
+        "expected_keywords": [
+          "operational resilience",
+          "ICT",
+          "risk",
+          "financial"
+        ],
+        "found_keywords": [
+          "operational resilience",
+          "ICT",
+          "risk",
+          "financial"
+        ],
+        "missing_keywords": [],
+        "keyword_coverage": 1.0
+      },
+      "answer_preview": "DORA (Digital Operational Resilience Act) focuses on digital operational resilience, which is defined as the ability of a financial entity to build, assure, and review its operational integrity and reliability. This is achieved by ensuring the full range of ICT-related capabilities needed to address the security of network and information systems, either directly or through ICT third-party service providers [Source 5].\n\nDORA requires financial entities to have a comprehensive digital operational resilience strategy that covers not only ICT systems, but also people and processes. This includes policies to cultivate cyber risk awareness and strict cyber hygiene at all levels, with ultimate res"
+    },
+    {
+      "id": "q8",
+      "question": "What does the AI Act say about high-risk AI systems?",
+      "passed": true,
+      "has_sources": true,
+      "num_sources": 5,
+      "average_retrieval_score": 0.027658,
+      "regulation_check": {
+        "expected_regulation": "AI_Act",
+        "retrieved_source_titles": [
+          "AI_Act",
+          "AI_Act",
+          "AI_Act",
+          "AI_Act",
+          "AI_Act"
+        ],
+        "expected_regulation_found": true,
+        "top_source_title": "AI_Act",
+        "top_source_matches_expected": true
+      },
+      "keyword_check": {
+        "expected_keywords": [
+          "high-risk",
+          "AI systems",
+          "requirements",
+          "risk"
+        ],
+        "found_keywords": [
+          "high-risk",
+          "AI systems",
+          "requirements",
+          "risk"
+        ],
+        "missing_keywords": [],
+        "keyword_coverage": 1.0
+      },
+      "answer_preview": "The AI Act defines high-risk AI systems as those that either serve as safety components in products covered by certain Union harmonisation legislation and require third-party conformity assessment, or those listed in Annex III of the Act. Annex III includes AI systems used in areas such as biometrics (e.g., remote biometric identification, biometric categorisation, emotion recognition), critical infrastructure management, and education and vocational training, among others [Source 2], [Source 4].\n\nHigh-risk AI systems must comply with specific requirements, considering their intended purpose and the state of the art in AI technologies. These requirements include effective risk management mea"
+    }
+  ]
+}

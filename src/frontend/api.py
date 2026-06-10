@@ -3,20 +3,36 @@ src/frontend/api.py
 
 FastAPI backend for the Regulatory Compliance Assistant.
 
-This API receives a user question, redacts basic PII, calls the RAG service,
-and returns an answer with sources.
+This API receives a user question, checks API key authentication,
+redacts basic PII, calls the RAG service, and returns an answer with sources.
 """
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
-from fastapi import FastAPI, HTTPException
+from dotenv import load_dotenv
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from src.governance.pii_redaction import redact_pii
 from src.rag_service import answer_question
+
+
+# =============================================================================
+# Load environment variables
+# =============================================================================
+
+load_dotenv()
+
+
+# =============================================================================
+# Configuration
+# =============================================================================
+
+APP_API_KEY = os.getenv("APP_API_KEY", "demo-secret-key")
 
 
 # =============================================================================
@@ -80,6 +96,34 @@ class AskResponse(BaseModel):
 
 
 # =============================================================================
+# Authentication helper
+# =============================================================================
+
+def validate_api_key(x_api_key: str | None) -> None:
+    """
+    Validate the API key sent by the frontend.
+
+    The client must send:
+
+        X-API-Key: demo-secret-key
+
+    or whatever value is configured in APP_API_KEY.
+    """
+
+    if not x_api_key:
+        raise HTTPException(
+            status_code=401,
+            detail="Missing API key.",
+        )
+
+    if x_api_key != APP_API_KEY:
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid API key.",
+        )
+
+
+# =============================================================================
 # Routes
 # =============================================================================
 
@@ -98,15 +142,22 @@ def health() -> dict[str, str]:
 
 
 @app.post("/ask", response_model=AskResponse)
-def ask(request: AskRequest) -> dict[str, Any]:
+def ask(
+    request: AskRequest,
+    x_api_key: str | None = Header(default=None, alias="X-API-Key"),
+) -> dict[str, Any]:
     """
     Ask a regulatory compliance question.
 
-    Before the question is sent to the RAG pipeline, common PII patterns
-    are redacted. This adds a lightweight governance control.
+    Security and governance steps:
+    1. Validate API key.
+    2. Redact common PII patterns.
+    3. Send the redacted question to the RAG pipeline.
     """
 
     try:
+        validate_api_key(x_api_key)
+
         redaction_result = redact_pii(request.question)
 
         print("=" * 100)
@@ -128,6 +179,9 @@ def ask(request: AskRequest) -> dict[str, Any]:
         )
 
         return result
+
+    except HTTPException:
+        raise
 
     except Exception as error:
         raise HTTPException(
