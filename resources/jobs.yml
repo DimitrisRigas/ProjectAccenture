@@ -4,7 +4,14 @@ resources:
       name: regulatory_compliance_pipeline
 
       tasks:
+        - task_key: downloader_job
+          spark_python_task:
+            python_file: ../src/jobs/downloader_job.py
+          environment_key: bronze_environment
+
         - task_key: bronze_ingestion
+          depends_on:
+            - task_key: downloader_job
           spark_python_task:
             python_file: ../src/jobs/bronze_ingestion.py
           environment_key: bronze_environment
@@ -45,6 +52,7 @@ resources:
               - pymupdf
               - beautifulsoup4
               - python-dotenv
+              - databricks-sdk
 
         - environment_key: silver_environment
           spec:
