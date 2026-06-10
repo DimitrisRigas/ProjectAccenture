@@ -1,3 +1,5 @@
+# Project Accenture
+
 We implemented the full end-to-end RAG pipeline: regulatory ingestion, Databricks Bronze/Silver/Gold processing, Azure OpenAI embeddings, Azure AI Search indexing, FastAPI API, and frontend answer generation with source traceability.
 
 For governance, we added Databricks Secrets, source metadata, document provenance, and lightweight PII redaction.
@@ -11,3 +13,15 @@ For the project demo, we implemented lightweight API-key authentication on the F
 The server validates the X-API-Key header before executing the RAG pipeline. 
 This demonstrates protected API access. 
 For production, this would be replaced by OAuth2/JWT or Azure AD authentication.
+
+## Gold embeddings
+### How to run:
+Push the secrets to Databricks (run once, locally)
+1. Create the scope `databricks secrets create-scope compliance-assistant`
+2. If that errors saying it exists, fine. Verify: `databricks secrets list-scopes`
+3. Now push each secret:
+   1. databricks secrets put-secret compliance-assistant AZURE_OPENAI_API_KEY --string-value "<value>"
+   2. databricks secrets put-secret compliance-assistant AZURE_OPENAI_ENDPOINT --string-value "<value>"
+   3. databricks secrets put-secret compliance-assistant AZURE_OPENAI_API_VERSION --string-value "<value>"
+   4. databricks secrets put-secret compliance-assistant EMBEDDING_MODEL_NAME --string-value "text-embedding-3-small"
+4. Verify they landed: `databricks secrets list-secrets compliance-assistant`

@@ -57,7 +57,10 @@ resources:
           spec:
             client: "2"
             dependencies:
+              - openai
               - python-dotenv
+              - pandas
+              - pyarrow
 
         - environment_key: azure_search_environment
           spec:

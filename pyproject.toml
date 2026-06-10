@@ -12,6 +12,7 @@ dependencies = [
     "databricks-vectorsearch>=0.74",
     "fastapi>=0.136.3",
     "langchain-openai>=1.2.2",
+    "langchain-text-splitters>=1.1.2",
     "openai>=2.41.0",
     "pydantic>=2.13.4",
     "pymupdf>=1.27.2.3",
