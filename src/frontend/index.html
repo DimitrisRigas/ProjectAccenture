@@ -1354,37 +1354,13 @@
                             <div class="pipeline-step">
                                 <div class="step-number">1</div>
                                 <div>
-                                    <strong>Regulatory document acquisition</strong>
-                                    <span>PDF, HTML, and XML regulatory documents are collected or registered from official EU sources.</span>
+                                    <strong>Databricks Bronze ingestion</strong>
+                                    <span>The Bronze ingestion job downloads regulatory documents directly from EUR-Lex via CELEX IDs, extracts text from PDFs, HTML, and XML files, and stores document-level and page-level records in Bronze Delta tables.</span>
                                 </div>
                             </div>
 
                             <div class="pipeline-step">
                                 <div class="step-number">2</div>
-                                <div>
-                                    <strong>Metadata manifest</strong>
-                                    <span>A manifest tracks regulation title, short title, CELEX identifier, source URL, file format, and lineage information.</span>
-                                </div>
-                            </div>
-
-                            <div class="pipeline-step">
-                                <div class="step-number">3</div>
-                                <div>
-                                    <strong>Databricks Volume</strong>
-                                    <span>Raw files and metadata are uploaded into a Unity Catalog Volume for governed cloud storage.</span>
-                                </div>
-                            </div>
-
-                            <div class="pipeline-step">
-                                <div class="step-number">4</div>
-                                <div>
-                                    <strong>Bronze ingestion</strong>
-                                    <span>Databricks extracts text from PDFs, HTML, and XML files and stores document-level and page-level records.</span>
-                                </div>
-                            </div>
-
-                            <div class="pipeline-step">
-                                <div class="step-number">5</div>
                                 <div>
                                     <strong>Silver chunking</strong>
                                     <span>Extracted text is split into overlapping AI-ready chunks while preserving metadata and source provenance.</span>
@@ -1392,7 +1368,7 @@
                             </div>
 
                             <div class="pipeline-step">
-                                <div class="step-number">6</div>
+                                <div class="step-number">3</div>
                                 <div>
                                     <strong>Gold embedding generation</strong>
                                     <span>The Gold job generates embeddings using Azure OpenAI and writes chunk text, metadata, and vectors to the Gold Delta table.</span>
@@ -1400,7 +1376,7 @@
                             </div>
 
                             <div class="pipeline-step">
-                                <div class="step-number">7</div>
+                                <div class="step-number">4</div>
                                 <div>
                                     <strong>Azure AI Search upload</strong>
                                     <span>The upload job reads existing Gold embeddings and uploads chunk text, metadata, and vectors to Azure AI Search.</span>
@@ -1408,7 +1384,7 @@
                             </div>
 
                             <div class="pipeline-step">
-                                <div class="step-number">8</div>
+                                <div class="step-number">5</div>
                                 <div>
                                     <strong>RAG API and frontend</strong>
                                     <span>FastAPI exposes the /ask endpoint and this frontend displays grounded answers with retrieved evidence.</span>

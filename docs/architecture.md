@@ -21,11 +21,9 @@ The architecture combines:
 ## 2. High-Level Architecture
 
 ```text
-Regulatory Sources
+Regulatory Sources (EUR-Lex via CELEX IDs)
     ↓
-Downloader and Metadata Manifest
-    ↓
-Databricks Unity Catalog Volume
+Databricks Bronze Ingestion (downloads directly)
     ↓
 Bronze Delta Tables
     ↓
@@ -51,7 +49,7 @@ Frontend Application
 | Layer                  | Purpose                                     | Implementation                                 |
 | ---------------------- | ------------------------------------------- | ---------------------------------------------- |
 | Data Sources Layer     | Collect regulatory documents                | EUR-Lex, EBA, ECB sources                      |
-| Ingestion Layer        | Download and prepare files                  | `src/downloader.py`, `src/upload_to_volume.py` |
+| Ingestion Layer        | Download and ingest regulatory documents    | `src/jobs/bronze_ingestion.py` (downloads from EUR-Lex) |
 | Data Engineering Layer | Transform raw data into AI-ready tables     | Databricks, PySpark, Delta Lake                |
 | Gold AI Layer          | Generate and store embeddings               | `src/jobs/gold_embeddings.py`, Azure OpenAI    |
 | Retrieval Layer        | Retrieve relevant regulatory chunks         | Azure AI Search                                |
@@ -82,22 +80,13 @@ The dataset contains PDF, HTML, and XML files. The documents are represented in 
 
 ## 5. Ingestion Layer
 
-The ingestion layer begins locally with:
+The ingestion layer is fully handled within Databricks by:
 
 ```text
-src/downloader.py
-src/upload_to_volume.py
+src/jobs/bronze_ingestion.py
 ```
 
-The downloader prepares the regulatory dataset and creates:
-
-```text
-data/metadata/document_manifest.json
-```
-
-The upload script transfers raw files and metadata into a Databricks Unity Catalog Volume.
-
-This separates local document acquisition from cloud-based data engineering. The current design is practical because some EUR-Lex PDFs may require manual handling before upload.
+The Bronze ingestion job downloads regulatory documents directly from EUR-Lex using CELEX IDs. It then extracts text from the downloaded PDF, HTML, and XML files and writes the results to Bronze Delta tables. There is no local download or manual upload step.
 
 ---
 
@@ -503,11 +492,9 @@ This automates the cloud-side pipeline from raw Volume data to searchable Azure 
 
 ## 17. Design Decisions
 
-### Local downloader and uploader
+### Document download integrated into Databricks
 
-The downloader and uploader are kept local because some regulatory PDFs may require manual handling. This makes the ingestion process more reliable for the current project.
-
-A future improvement would be to move document acquisition into a Databricks job.
+Regulatory document acquisition is fully handled by the Bronze ingestion job. The job downloads documents directly from EUR-Lex via CELEX IDs, eliminating any local download or manual upload step. This keeps the entire ingestion pipeline within the governed Databricks environment.
 
 ### Embeddings generated in the Gold layer
 
@@ -531,7 +518,6 @@ The local FastAPI application layer is Dockerized for reproducible local executi
 
 Current limitations include:
 
-* manual handling for some source documents,
 * simple API key authentication,
 * lightweight PII redaction,
 * no full user management,
@@ -546,7 +532,6 @@ Current limitations include:
 
 Future improvements include:
 
-* cloud-native downloader job inside Databricks,
 * regulation-specific filters,
 * semantic reranking,
 * Azure Key Vault integration,

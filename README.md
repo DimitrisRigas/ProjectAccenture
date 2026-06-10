@@ -32,9 +32,7 @@ This project addresses the problem by implementing a RAG-based compliance assist
 
 The system supports:
 
-* regulatory document acquisition,
-* metadata manifest creation,
-* upload to Databricks Unity Catalog Volume,
+* regulatory document download via Databricks ingestion job,
 * Bronze/Silver/Gold Delta table processing,
 * PDF, HTML, and XML text extraction,
 * AI-ready chunking with metadata and lineage,
@@ -55,13 +53,9 @@ The system supports:
 ## 4. High-Level Architecture
 
 ```text
-Regulatory Sources
+Regulatory Sources (EUR-Lex via CELEX IDs)
     ↓
-Local Downloader
-    ↓
-Metadata Manifest
-    ↓
-Databricks Volume Upload
+Databricks Bronze Ingestion (downloads directly)
     ↓
 Bronze Delta Tables
     ↓
@@ -87,7 +81,7 @@ Frontend Application
 | Layer                         | Implementation                                            |
 | ----------------------------- | --------------------------------------------------------- |
 | Data Sources Layer            | EUR-Lex PDFs, EBA HTML, ECB XML                           |
-| Ingestion Layer               | `src/downloader.py`, `src/upload_to_volume.py`            |
+| Ingestion Layer               | `src/jobs/bronze_ingestion.py` (downloads from EUR-Lex)   |
 | Data Engineering Layer        | Databricks jobs, PySpark, Bronze/Silver/Gold Delta tables |
 | AI Processing Layer           | Azure OpenAI embeddings and GPT-4o                        |
 | Retrieval Layer               | Azure AI Search vector and hybrid retrieval               |
@@ -161,49 +155,7 @@ ProjectAccenture/
 
 ## 7. Main Components
 
-### 7.1 Regulatory Downloader
-
-File:
-
-```text
-src/downloader.py
-```
-
-The downloader prepares the regulatory dataset by collecting or registering regulatory documents. It supports manual PDF handling for documents that are difficult to download automatically and creates a metadata manifest for downstream processing.
-
-The downloader prepares:
-
-* GDPR PDF,
-* DORA PDF,
-* PSD2 PDF,
-* MiFID II PDF,
-* EU AI Act PDF,
-* EBA HTML source,
-* ECB XML source.
-
-It creates the manifest at:
-
-```text
-data/metadata/document_manifest.json
-```
-
----
-
-### 7.2 Databricks Volume Upload
-
-File:
-
-```text
-src/upload_to_volume.py
-```
-
-The upload script transfers local raw documents and metadata into a Databricks Unity Catalog Volume.
-
-The Databricks Volume acts as the governed storage layer for raw regulatory documents before they are processed into Delta tables.
-
----
-
-### 7.3 Bronze Ingestion
+### 7.1 Bronze Ingestion
 
 File:
 
@@ -211,7 +163,7 @@ File:
 src/jobs/bronze_ingestion.py
 ```
 
-The Bronze job reads the metadata manifest and raw files from the Databricks Volume.
+The Bronze job is the entry point of the ingestion pipeline. It downloads regulatory documents directly from EUR-Lex using CELEX IDs, then extracts text from the downloaded files.
 
 It extracts text from:
 
@@ -230,7 +182,7 @@ The Bronze layer keeps raw extracted text, document metadata, source provenance,
 
 ---
 
-### 7.4 Silver Chunking
+### 7.2 Silver Chunking
 
 File:
 
@@ -264,7 +216,7 @@ Each chunk includes:
 
 ---
 
-### 7.5 Gold Embedding Generation
+### 7.3 Gold Embedding Generation
 
 File:
 
@@ -302,7 +254,7 @@ Embeddings are generated using the Azure OpenAI embedding deployment configured 
 
 ---
 
-### 7.6 Azure AI Search Index Creation
+### 7.4 Azure AI Search Index Creation
 
 File:
 
@@ -329,7 +281,7 @@ The index supports vector retrieval and hybrid search.
 
 ---
 
-### 7.7 Azure AI Search Upload
+### 7.5 Azure AI Search Upload
 
 File:
 
@@ -362,7 +314,7 @@ This separation avoids re-embedding chunks every time the Azure AI Search index 
 
 ---
 
-### 7.8 RAG Service
+### 7.6 RAG Service
 
 File:
 
@@ -397,7 +349,7 @@ The RAG prompt is designed to enforce:
 
 ---
 
-### 7.9 FastAPI Backend
+### 7.7 FastAPI Backend
 
 File:
 
@@ -440,7 +392,7 @@ The backend includes:
 
 ---
 
-### 7.10 Frontend Application
+### 7.8 Frontend Application
 
 File:
 
@@ -463,7 +415,7 @@ It displays:
 
 ---
 
-### 7.11 Governance and PII Redaction
+### 7.9 Governance and PII Redaction
 
 File:
 
@@ -496,7 +448,7 @@ This provides a basic responsible AI and privacy control for the application lay
 
 ---
 
-### 7.12 Evaluation Pipeline
+### 7.10 Evaluation Pipeline
 
 Files:
 
@@ -632,23 +584,7 @@ uv sync
 
 ---
 
-### 11.2 Run the downloader
-
-```powershell
-uv run python src/downloader.py
-```
-
----
-
-### 11.3 Upload files to Databricks Volume
-
-```powershell
-uv run python src/upload_to_volume.py
-```
-
----
-
-### 11.4 Deploy and run Databricks Bundle
+### 11.2 Deploy and run Databricks Bundle
 
 Validate the bundle:
 
@@ -670,7 +606,7 @@ databricks bundle run regulatory_compliance_pipeline -p train13
 
 ---
 
-### 11.5 Run the FastAPI backend locally
+### 11.3 Run the FastAPI backend locally
 
 ```powershell
 uv run uvicorn src.frontend.api:app --reload
@@ -690,7 +626,7 @@ http://127.0.0.1:8000/docs
 
 ---
 
-### 11.6 Open the frontend
+### 11.4 Open the frontend
 
 Open:
 
@@ -892,7 +828,6 @@ For production, API key authentication should be replaced with enterprise authen
 
 Current limitations include:
 
-* manual PDF handling is still required for some EUR-Lex documents,
 * the frontend API key is visible in browser JavaScript and is only suitable for demonstration,
 * the evaluation dataset is lightweight and should be expanded for production,
 * there is no full user management system,
@@ -906,7 +841,6 @@ Current limitations include:
 
 Future improvements include:
 
-* moving the downloader fully into a Databricks job,
 * adding regulation-specific filters when a question explicitly mentions a regulation,
 * adding semantic reranking,
 * expanding evaluation questions,

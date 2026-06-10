@@ -54,11 +54,9 @@ Show the README or architecture diagram.
 Explain the flow:
 
 ```text
-Regulatory documents
+Regulatory documents (EUR-Lex via CELEX IDs)
     ↓
-Downloader and metadata manifest
-    ↓
-Databricks Volume
+Databricks Bronze Ingestion (downloads directly)
     ↓
 Bronze Delta tables
     ↓
@@ -79,7 +77,7 @@ Frontend application
 
 Suggested speaking notes:
 
-> We use Databricks for the governed data engineering part of the system. Raw documents are uploaded to a Unity Catalog Volume and processed into Bronze, Silver, and Gold Delta tables. Bronze stores extracted regulatory text, Silver creates AI-ready chunks, and Gold generates embeddings using Azure OpenAI. The embedded Gold chunks are then uploaded to Azure AI Search. The application layer uses FastAPI and a frontend to query the index and generate grounded answers with GPT-4o.
+> We use Databricks for the governed data engineering part of the system. The Bronze ingestion job downloads regulatory documents directly from EUR-Lex via CELEX IDs and processes them into Bronze, Silver, and Gold Delta tables. Bronze stores extracted regulatory text, Silver creates AI-ready chunks, and Gold generates embeddings using Azure OpenAI. The embedded Gold chunks are then uploaded to Azure AI Search. The application layer uses FastAPI and a frontend to query the index and generate grounded answers with GPT-4o.
 
 ---
 
@@ -349,7 +347,6 @@ Suggested speaking notes:
 Mention honestly:
 
 * API key authentication is demo-level.
-* Some PDFs are manually handled.
 * Evaluation dataset is lightweight.
 * Production deployment would require stronger identity management and monitoring.
 * Regulation-specific filters and semantic reranking could improve retrieval further.
