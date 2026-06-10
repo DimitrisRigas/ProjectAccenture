@@ -14,7 +14,7 @@ Input Volume structure:
     │   └── xml/
     └── metadata/
         └── document_manifest.json
-
+git 
 Output:
     Bronze Delta tables:
     - bronze_regulatory_documents
