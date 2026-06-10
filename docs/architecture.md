@@ -4,15 +4,16 @@
 
 The AI-Powered Regulatory Compliance Assistant is an end-to-end Retrieval-Augmented Generation system for EU financial regulatory documents.
 
-The system ingests regulatory documents, processes them into AI-ready chunks, creates embeddings, indexes them in Azure AI Search, and exposes a FastAPI and frontend interface for natural-language question answering.
+The system ingests regulatory documents, processes them into AI-ready chunks, generates embeddings in the Gold layer, uploads the embedded chunks to Azure AI Search, and exposes a FastAPI and frontend interface for natural-language question answering.
 
 The architecture combines:
 
 * Databricks for governed data engineering,
 * Delta Lake for Bronze/Silver/Gold processing,
-* Azure OpenAI for embeddings and answer generation,
+* Azure OpenAI for embedding generation and answer generation,
 * Azure AI Search for vector and hybrid retrieval,
 * FastAPI for the API layer,
+* Docker for the local application layer,
 * and a browser frontend for user interaction.
 
 ---
@@ -30,11 +31,9 @@ Bronze Delta Tables
     ↓
 Silver Chunking
     ↓
-Gold Retrieval Table
+Gold Embedding Generation
     ↓
-Azure OpenAI Embeddings
-    ↓
-Azure AI Search Index
+Azure AI Search Index Upload
     ↓
 Hybrid Retrieval
     ↓
@@ -49,18 +48,19 @@ Frontend Application
 
 ## 3. Architecture Layers
 
-| Layer                  | Purpose                                     | Implementation                              |
-| ---------------------- | ------------------------------------------- | ------------------------------------------- |
-| Data Sources Layer     | Collect regulatory documents                | EUR-Lex, EBA, ECB sources                   |
-| Ingestion Layer        | Download and prepare files                  | `src/downloader.py`, `src/uploader.py`      |
-| Data Engineering Layer | Transform raw data into AI-ready tables     | Databricks, PySpark, Delta Lake             |
-| AI Processing Layer    | Generate embeddings and LLM responses       | Azure OpenAI                                |
-| Retrieval Layer        | Retrieve relevant regulatory chunks         | Azure AI Search                             |
-| RAG Layer              | Build context and generate grounded answers | `src/rag_service.py`                        |
-| API Layer              | Expose question-answering endpoint          | FastAPI `/ask`                              |
-| Application Layer      | User interface                              | HTML/CSS/JavaScript frontend                |
-| Governance Layer       | Secrets, PII, traceability                  | Databricks Secrets, PII redaction, metadata |
-| Evaluation Layer       | Measure retrieval and answer quality        | `src/evaluation/evaluate_rag.py`            |
+| Layer                  | Purpose                                     | Implementation                                 |
+| ---------------------- | ------------------------------------------- | ---------------------------------------------- |
+| Data Sources Layer     | Collect regulatory documents                | EUR-Lex, EBA, ECB sources                      |
+| Ingestion Layer        | Download and prepare files                  | `src/downloader.py`, `src/upload_to_volume.py` |
+| Data Engineering Layer | Transform raw data into AI-ready tables     | Databricks, PySpark, Delta Lake                |
+| Gold AI Layer          | Generate and store embeddings               | `src/jobs/gold_embeddings.py`, Azure OpenAI    |
+| Retrieval Layer        | Retrieve relevant regulatory chunks         | Azure AI Search                                |
+| RAG Layer              | Build context and generate grounded answers | `src/rag_service.py`                           |
+| API Layer              | Expose question-answering endpoint          | FastAPI `/ask`                                 |
+| Application Layer      | User interface                              | HTML/CSS/JavaScript frontend                   |
+| Governance Layer       | Secrets, PII, traceability                  | Databricks Secrets, PII redaction, metadata    |
+| DevOps Layer           | Local application containerization          | Dockerfile, Docker Compose                     |
+| Evaluation Layer       | Measure retrieval and answer quality        | `src/evaluation/evaluate_rag.py`               |
 
 ---
 
@@ -86,7 +86,7 @@ The ingestion layer begins locally with:
 
 ```text
 src/downloader.py
-src/uploader.py
+src/upload_to_volume.py
 ```
 
 The downloader prepares the regulatory dataset and creates:
@@ -95,7 +95,7 @@ The downloader prepares the regulatory dataset and creates:
 data/metadata/document_manifest.json
 ```
 
-The uploader transfers raw files and metadata into a Databricks Unity Catalog Volume.
+The upload script transfers raw files and metadata into a Databricks Unity Catalog Volume.
 
 This separates local document acquisition from cloud-based data engineering. The current design is practical because some EUR-Lex PDFs may require manual handling before upload.
 
@@ -158,9 +158,9 @@ The Silver job splits long regulatory text into overlapping chunks and keeps met
 * chunk index,
 * chunk length.
 
-### Gold Layer
+### Gold Embedding Layer
 
-The Gold layer prepares the final clean retrieval table.
+The Gold layer creates the final AI-ready embeddings table.
 
 Main job:
 
@@ -168,19 +168,37 @@ Main job:
 src/jobs/gold_embeddings.py
 ```
 
+Input:
+
+```text
+accenture2026dbcks.team4.silver_document_chunks
+```
+
 Output:
 
 ```text
-accenture2026dbcks.team4.gold_document_embeddings
+accenture2026dbcks.team4.gold_chunk_embeddings
 ```
 
-This table contains clean chunk text and metadata used by the embedding and indexing process.
+The Gold job reads regulatory chunks from the Silver table and generates embeddings using Azure OpenAI. The resulting Gold table contains both the original chunk text and the generated embedding vector.
 
-The Gold job does not generate embeddings directly. Instead, it prepares the final dataset that is later embedded and uploaded to Azure AI Search.
+The Gold table includes:
+
+* chunk ID,
+* chunk text,
+* regulation title,
+* short title,
+* source URL,
+* page number,
+* file name,
+* metadata fields,
+* and embedding vector.
+
+This makes the Gold table the final AI-ready retrieval dataset.
 
 ---
 
-## 7. Azure AI Search and Embeddings
+## 7. Azure AI Search Index and Upload Layer
 
 The Azure AI Search index is created by:
 
@@ -207,12 +225,26 @@ The upload job is:
 src/jobs/upload_gold_to_azure_search.py
 ```
 
-This job:
+This job reads the existing embeddings from the Gold table:
 
-1. Reads rows from the Gold Delta table.
-2. Sends chunk text to Azure OpenAI for embedding generation.
-3. Receives vector embeddings.
-4. Uploads chunk text, metadata, and embeddings to Azure AI Search.
+```text
+accenture2026dbcks.team4.gold_chunk_embeddings
+```
+
+The upload job does not call Azure OpenAI and does not compute embeddings. It uploads the existing chunk text, metadata, and embedding vectors to Azure AI Search.
+
+This design avoids duplicate embedding generation and makes the indexing stage faster and cheaper.
+
+The upload job sends the following fields to Azure AI Search:
+
+* `chunk_id`
+* `chunk_text`
+* `embedding`
+* `short_title`
+* `regulation_title`
+* `source_url`
+* `page_number`
+* `file_name`
 
 ---
 
@@ -328,7 +360,34 @@ The frontend calls the FastAPI `/ask` endpoint and displays the answer with trac
 
 ---
 
-## 12. Governance and Security
+## 12. Dockerized Local Application Layer
+
+The local application layer is Dockerized using Docker and Docker Compose.
+
+Docker files:
+
+```text
+Dockerfile
+docker-compose.yml
+.dockerignore
+```
+
+The Docker container runs:
+
+* FastAPI backend,
+* RAG service,
+* Azure AI Search retrieval client,
+* Azure OpenAI client,
+* API key authentication,
+* and PII redaction logic.
+
+Databricks, Azure OpenAI, Azure AI Search, Unity Catalog, and Delta tables remain external managed cloud services.
+
+Runtime configuration is injected through the `.env` file using Docker Compose. The `.env` file is not copied into the Docker image and should not be committed to Git.
+
+---
+
+## 13. Governance and Security
 
 The architecture includes several governance and security controls:
 
@@ -345,7 +404,30 @@ The current API key mechanism is suitable for demonstration. In a production sys
 
 ---
 
-## 13. Evaluation and Monitoring
+## 14. Databricks Secrets
+
+Databricks jobs read cloud credentials from the secret scope:
+
+```text
+compliance-assistant
+```
+
+Required keys:
+
+```text
+AI_SEARCH_ENDPOINT
+AI_SEARCH_API_KEY
+AZURE_OPENAI_ENDPOINT
+AZURE_OPENAI_API_KEY
+AZURE_OPENAI_API_VERSION
+EMBEDDING_MODEL_NAME
+```
+
+The Gold embeddings job uses the Azure OpenAI secrets to generate embeddings. The Azure AI Search upload job uses the AI Search secrets to upload embedded chunks to the search index.
+
+---
+
+## 15. Evaluation and Monitoring
 
 The evaluation pipeline is implemented in:
 
@@ -385,7 +467,7 @@ The final benchmark contains 12 questions and achieved:
 
 ---
 
-## 14. Databricks Workflow
+## 16. Databricks Workflow
 
 The Databricks Bundle workflow is defined in:
 
@@ -407,11 +489,19 @@ create_azure_search_index
 upload_gold_to_azure_search
 ```
 
+Task responsibilities:
+
+* `bronze_ingestion` extracts text and metadata from raw files.
+* `silver_chunking` creates AI-ready chunks.
+* `gold_embeddings` generates embeddings and writes the Gold Delta table.
+* `create_azure_search_index` creates or updates the Azure AI Search index.
+* `upload_gold_to_azure_search` reads existing Gold embeddings and uploads them to Azure AI Search.
+
 This automates the cloud-side pipeline from raw Volume data to searchable Azure AI Search chunks.
 
 ---
 
-## 15. Design Decisions
+## 17. Design Decisions
 
 ### Local downloader and uploader
 
@@ -419,17 +509,25 @@ The downloader and uploader are kept local because some regulatory PDFs may requ
 
 A future improvement would be to move document acquisition into a Databricks job.
 
-### Embeddings outside the Gold job
+### Embeddings generated in the Gold layer
 
-The Gold job prepares clean retrieval data, while `upload_gold_to_azure_search.py` creates embeddings and uploads to Azure AI Search. This separation keeps the Delta table preparation independent from the external Azure indexing process.
+The Gold job generates embeddings and stores them in the Gold Delta table. This creates a reusable AI-ready table containing both chunk text and vector embeddings.
+
+The Azure AI Search upload job only uploads existing embeddings from the Gold table. It does not re-embed chunks.
+
+This design avoids unnecessary duplicate embedding generation and makes Azure AI Search index rebuilds faster and cheaper.
 
 ### Azure AI Search instead of only Databricks Vector Search
 
 Azure AI Search was used because it integrates well with the FastAPI application layer and supports hybrid retrieval using both keyword and vector search.
 
+### Dockerized local application layer
+
+The local FastAPI application layer is Dockerized for reproducible local execution and presentation. Cloud services such as Databricks, Azure OpenAI, and Azure AI Search remain external managed services.
+
 ---
 
-## 16. Current Limitations
+## 18. Current Limitations
 
 Current limitations include:
 
@@ -439,11 +537,12 @@ Current limitations include:
 * no full user management,
 * no production deployment,
 * limited evaluation dataset,
-* and no advanced observability dashboard.
+* no advanced observability dashboard,
+* and no enterprise identity integration.
 
 ---
 
-## 17. Future Architecture Improvements
+## 19. Future Architecture Improvements
 
 Future improvements include:
 
@@ -455,5 +554,6 @@ Future improvements include:
 * expanded evaluation set,
 * adversarial and negative test cases,
 * monitoring dashboard,
-* Dockerized deployment,
-* and CI/CD automation.
+* automated CI/CD pipeline,
+* cloud deployment of the FastAPI/frontend layer,
+* and production observability.

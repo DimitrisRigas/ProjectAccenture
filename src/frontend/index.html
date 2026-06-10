@@ -11,17 +11,25 @@
         }
 
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --purple: #7c3aed;
+            --bg-dark: #050816;
+            --bg-dark-2: #0f172a;
+            --panel: #ffffff;
+            --panel-soft: #f8fafc;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --blue: #2563eb;
+            --blue-dark: #1d4ed8;
+            --violet: #7c3aed;
             --cyan: #06b6d4;
             --green: #16a34a;
             --red: #dc2626;
-            --text: #0f172a;
-            --muted: #64748b;
-            --border: rgba(226, 232, 240, 0.9);
-            --shadow: 0 30px 90px rgba(2, 6, 23, 0.28);
-            --soft-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+            --amber: #d97706;
+            --shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+            --shadow-dark: 0 30px 90px rgba(2, 6, 23, 0.42);
+            --radius-xl: 32px;
+            --radius-lg: 22px;
+            --radius-md: 16px;
         }
 
         html {
@@ -31,9 +39,15 @@
         body {
             margin: 0;
             min-height: 100vh;
-            font-family: "Segoe UI", Arial, sans-serif;
+            font-family: "Segoe UI", Inter, Arial, sans-serif;
             color: var(--text);
             background: #020617;
+        }
+
+        button,
+        textarea,
+        select {
+            font-family: inherit;
         }
 
         .page {
@@ -44,9 +58,14 @@
             display: block;
         }
 
+        .shell {
+            width: min(1220px, calc(100% - 40px));
+            margin: 0 auto;
+        }
+
         .nav-shell {
             position: fixed;
-            top: 18px;
+            top: 16px;
             left: 0;
             right: 0;
             z-index: 100;
@@ -57,15 +76,15 @@
             max-width: 1220px;
             margin: 0 auto;
             padding: 12px;
-            border-radius: 24px;
+            border-radius: 26px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 16px;
-            background: rgba(15, 23, 42, 0.70);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 18px 60px rgba(2, 6, 23, 0.30);
+            background: rgba(2, 6, 23, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(22px);
+            box-shadow: var(--shadow-dark);
         }
 
         .brand {
@@ -73,47 +92,58 @@
             align-items: center;
             gap: 13px;
             color: white;
+            min-width: 0;
         }
 
-        .logo {
-            width: 46px;
-            height: 46px;
-            border-radius: 16px;
+        .brand-mark {
+            width: 48px;
+            height: 48px;
+            border-radius: 18px;
             display: grid;
             place-items: center;
-            color: white;
-            font-size: 23px;
-            background: linear-gradient(135deg, var(--primary), var(--purple));
-            box-shadow: 0 14px 35px rgba(37, 99, 235, 0.42);
+            font-weight: 950;
+            letter-spacing: -1px;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.04)),
+                linear-gradient(135deg, var(--blue), var(--violet));
+            box-shadow: 0 18px 42px rgba(37, 99, 235, 0.42);
         }
 
         .brand-title {
-            font-weight: 900;
-            font-size: 18px;
-            letter-spacing: -0.4px;
+            font-size: 17px;
+            font-weight: 950;
+            letter-spacing: -0.35px;
+            white-space: nowrap;
         }
 
         .brand-subtitle {
-            margin-top: 2px;
-            color: rgba(255, 255, 255, 0.66);
+            margin-top: 3px;
+            color: rgba(255, 255, 255, 0.62);
             font-size: 12px;
+            white-space: nowrap;
         }
 
         .nav-actions {
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn,
+        .status-pill {
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 850;
         }
 
         .nav-btn {
             border: 1px solid rgba(255, 255, 255, 0.16);
+            color: rgba(255, 255, 255, 0.84);
+            background: rgba(255, 255, 255, 0.08);
             cursor: pointer;
-            border-radius: 999px;
-            padding: 10px 15px;
-            background: rgba(255, 255, 255, 0.10);
-            color: rgba(255, 255, 255, 0.82);
-            font-weight: 850;
-            transition: all 0.16s ease;
+            transition: 0.18s ease;
         }
 
         .nav-btn:hover,
@@ -123,26 +153,20 @@
         }
 
         .status-pill {
-            padding: 10px 14px;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            background: rgba(255, 255, 255, 0.12);
-            color: rgba(255, 255, 255, 0.88);
-            font-weight: 850;
-            font-size: 13px;
-            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: rgba(255, 255, 255, 0.86);
+            background: rgba(255, 255, 255, 0.09);
         }
 
-        /* CHAT PAGE */
-
         .hero {
-            min-height: 100vh;
             position: relative;
+            min-height: 100vh;
+            padding: 132px 0 72px;
+            color: white;
             overflow: hidden;
-            padding: 132px 22px 60px;
             background:
-                linear-gradient(rgba(2, 6, 23, 0.68), rgba(2, 6, 23, 0.62)),
-                url("https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=2200&q=80");
+                linear-gradient(90deg, rgba(2, 6, 23, 0.92), rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.62)),
+                url("https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=2200&q=85");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -153,157 +177,271 @@
             position: absolute;
             inset: 0;
             background:
-                radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.38), transparent 28%),
-                radial-gradient(circle at 80% 30%, rgba(124, 58, 237, 0.35), transparent 25%),
-                radial-gradient(circle at 55% 90%, rgba(6, 182, 212, 0.20), transparent 32%);
+                radial-gradient(circle at 18% 18%, rgba(37, 99, 235, 0.35), transparent 28%),
+                radial-gradient(circle at 74% 26%, rgba(124, 58, 237, 0.25), transparent 24%),
+                linear-gradient(180deg, rgba(2, 6, 23, 0.06), rgba(2, 6, 23, 0.38));
             pointer-events: none;
         }
 
-        .hero-inner {
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: 0.11;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.22) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px);
+            background-size: 64px 64px;
+            mask-image: linear-gradient(to bottom, black 0%, transparent 88%);
+            pointer-events: none;
+        }
+
+        .hero-grid {
             position: relative;
             z-index: 1;
-            width: 100%;
-            max-width: 1220px;
-            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 0.95fr 1.05fr;
+            gap: 34px;
+            align-items: center;
         }
 
-        .hero-content {
-            max-width: 950px;
-            margin: 0 auto;
-            text-align: center;
-            color: white;
-        }
-
-        .badge {
+        .eyebrow {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 9px 15px;
+            gap: 9px;
+            margin-bottom: 18px;
+            padding: 9px 14px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.14);
-            border: 1px solid rgba(255, 255, 255, 0.23);
-            backdrop-filter: blur(16px);
-            color: white;
-            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            background: rgba(255, 255, 255, 0.10);
+            color: rgba(255, 255, 255, 0.88);
             font-weight: 850;
-            margin-bottom: 20px;
+            font-size: 13px;
+            backdrop-filter: blur(18px);
+        }
+
+        .pulse-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 999px;
+            background: #22c55e;
+            box-shadow: 0 0 0 7px rgba(34, 197, 94, 0.16);
         }
 
         h1 {
             margin: 0;
-            font-size: clamp(42px, 7vw, 86px);
-            line-height: 0.94;
+            max-width: 760px;
+            font-size: clamp(46px, 6.8vw, 84px);
+            line-height: 0.96;
             letter-spacing: -3px;
         }
 
-        .hero-text {
-            max-width: 760px;
-            margin: 24px auto 0;
-            color: rgba(255, 255, 255, 0.78);
+        .lead {
+            max-width: 690px;
+            margin: 24px 0 0;
+            color: rgba(255, 255, 255, 0.74);
             font-size: 19px;
             line-height: 1.75;
         }
 
+        .executive-strip {
+            margin-top: 26px;
+            padding: 16px;
+            border-radius: 28px;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)),
+                rgba(15, 23, 42, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(22px);
+            box-shadow: 0 24px 70px rgba(2, 6, 23, 0.36);
+        }
+
+        .executive-strip-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 13px;
+            color: rgba(255, 255, 255, 0.88);
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .executive-strip-title span:last-child {
+            color: rgba(255, 255, 255, 0.56);
+            font-size: 12px;
+            font-weight: 750;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .executive-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .executive-metric-card {
+            position: relative;
+            overflow: hidden;
+            padding: 18px;
+            border-radius: 22px;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.06));
+            border: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        .executive-metric-card::before {
+            content: "";
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            right: -48px;
+            top: -48px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(96, 165, 250, 0.32), transparent 68%);
+        }
+
+        .executive-metric-icon {
+            width: 38px;
+            height: 38px;
+            margin-bottom: 13px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            font-size: 18px;
+        }
+
+        .executive-metric-value {
+            position: relative;
+            z-index: 1;
+            color: white;
+            font-size: 30px;
+            font-weight: 950;
+            letter-spacing: -0.9px;
+        }
+
+        .executive-metric-label {
+            position: relative;
+            z-index: 1;
+            margin-top: 5px;
+            color: rgba(255, 255, 255, 0.62);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
         .chat-shell {
-            max-width: 930px;
-            margin: 44px auto 0;
-            border-radius: 36px;
             padding: 1px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.42), rgba(255,255,255,0.12));
-            box-shadow: var(--shadow);
+            border-radius: var(--radius-xl);
+            background: linear-gradient(135deg, rgba(255,255,255,0.42), rgba(255,255,255,0.08));
+            box-shadow: var(--shadow-dark);
         }
 
         .chat-card {
-            border-radius: 35px;
-            padding: 23px;
-            background: rgba(15, 23, 42, 0.64);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            backdrop-filter: blur(22px);
+            border-radius: calc(var(--radius-xl) - 1px);
+            padding: 24px;
+            background: rgba(15, 23, 42, 0.74);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(24px);
         }
 
-        .chat-header {
+        .chat-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             margin-bottom: 16px;
-            color: white;
         }
 
         .chat-title {
+            font-size: 18px;
+            font-weight: 950;
+            letter-spacing: -0.35px;
+        }
+
+        .chat-caption {
+            margin-top: 3px;
+            color: rgba(255,255,255,0.58);
+            font-size: 12px;
+        }
+
+        .top-k {
             display: flex;
+            gap: 8px;
             align-items: center;
-            gap: 11px;
-            font-weight: 900;
-            letter-spacing: -0.3px;
-        }
-
-        .chat-dot {
-            width: 11px;
-            height: 11px;
+            padding: 8px 10px;
             border-radius: 999px;
-            background: #22c55e;
-            box-shadow: 0 0 0 7px rgba(34, 197, 94, 0.14);
-        }
-
-        .chat-mode {
+            border: 1px solid rgba(255,255,255,0.16);
+            color: rgba(255,255,255,0.70);
             font-size: 13px;
-            color: rgba(255,255,255,0.68);
-            border: 1px solid rgba(255,255,255,0.18);
-            padding: 7px 10px;
-            border-radius: 999px;
+        }
+
+        select {
+            border: 0;
+            outline: 0;
+            color: white;
+            background: transparent;
+            font-weight: 850;
+        }
+
+        select option {
+            color: #0f172a;
         }
 
         textarea {
             width: 100%;
-            min-height: 145px;
+            min-height: 176px;
             resize: vertical;
             padding: 20px;
-            border: 1px solid rgba(255,255,255,0.16);
             border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.16);
             outline: none;
-            font-size: 17px;
-            line-height: 1.58;
             color: white;
-            background: rgba(2, 6, 23, 0.48);
-            transition: all 0.2s ease;
+            background: rgba(2, 6, 23, 0.52);
+            font-size: 16.5px;
+            line-height: 1.62;
+            transition: 0.18s ease;
         }
 
         textarea::placeholder {
-            color: rgba(255,255,255,0.46);
+            color: rgba(255,255,255,0.42);
         }
 
         textarea:focus {
-            border-color: rgba(96, 165, 250, 0.82);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.22);
+            border-color: rgba(96, 165, 250, 0.86);
+            box-shadow: 0 0 0 4px rgba(37,99,235,0.20);
         }
 
         .actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            margin-top: 14px;
         }
 
         button {
             border: none;
             cursor: pointer;
-            border-radius: 18px;
-            padding: 15px 20px;
-            font-size: 15px;
-            font-weight: 900;
-            transition: all 0.16s ease;
+            border-radius: 17px;
+            padding: 14px 18px;
+            font-size: 14px;
+            font-weight: 950;
+            transition: 0.16s ease;
         }
 
         .primary-btn {
-            flex: 1;
             color: white;
-            background: linear-gradient(135deg, var(--primary), var(--purple));
-            box-shadow: 0 18px 42px rgba(37, 99, 235, 0.38);
+            background: linear-gradient(135deg, var(--blue), var(--violet));
+            box-shadow: 0 18px 42px rgba(37,99,235,0.34);
         }
 
         .primary-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 22px 50px rgba(37, 99, 235, 0.48);
+            box-shadow: 0 22px 52px rgba(37,99,235,0.44);
         }
 
         .primary-btn:disabled {
@@ -313,101 +451,171 @@
         }
 
         .secondary-btn {
-            background: rgba(255, 255, 255, 0.12);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: rgba(255,255,255,0.90);
+            background: rgba(255,255,255,0.10);
+            border: 1px solid rgba(255,255,255,0.16);
         }
 
         .secondary-btn:hover {
-            background: rgba(255, 255, 255, 0.20);
+            background: rgba(255,255,255,0.18);
         }
 
         .examples {
+            margin-top: 17px;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-top: 18px;
         }
 
         .example-chip {
             padding: 10px 13px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.10);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            color: rgba(255, 255, 255, 0.82);
+            background: rgba(255,255,255,0.09);
+            border: 1px solid rgba(255,255,255,0.14);
+            color: rgba(255,255,255,0.80);
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: 0.16s ease;
         }
 
         .example-chip:hover {
-            background: rgba(255, 255, 255, 0.20);
+            background: rgba(255,255,255,0.18);
             color: white;
             transform: translateY(-1px);
         }
 
         .error {
             display: none;
-            margin-top: 18px;
-            padding: 15px;
+            margin-top: 16px;
+            padding: 14px 16px;
             border-radius: 16px;
-            background: rgba(254, 242, 242, 0.96);
+            background: #fef2f2;
             color: #991b1b;
             border: 1px solid #fecaca;
             line-height: 1.5;
             text-align: left;
         }
 
-        .results-section {
-            background:
-                linear-gradient(180deg, #020617, #0f172a 32%, #f8fafc 32%);
-            padding: 76px 20px 70px;
+        .loader {
+            width: 17px;
+            height: 17px;
+            margin-right: 8px;
+            border-radius: 999px;
+            border: 3px solid rgba(255,255,255,0.45);
+            border-top-color: white;
+            display: inline-block;
+            vertical-align: middle;
+            animation: spin 0.8s linear infinite;
         }
 
-        .results-inner {
-            max-width: 1220px;
-            margin: 0 auto;
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .results-section {
+            padding: 74px 0 78px;
+            background:
+                radial-gradient(circle at 16% 12%, rgba(37, 99, 235, 0.08), transparent 26%),
+                radial-gradient(circle at 88% 28%, rgba(124, 58, 237, 0.08), transparent 26%),
+                #f8fafc;
         }
 
         .empty-card,
         .result-card {
-            border-radius: 32px;
-            background: rgba(255, 255, 255, 0.94);
-            border: 1px solid rgba(226, 232, 240, 0.9);
-            box-shadow: 0 30px 90px rgba(15, 23, 42, 0.18);
+            border-radius: var(--radius-xl);
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
             overflow: hidden;
         }
 
         .empty-card {
-            padding: 46px 28px;
+            padding: 50px 32px;
             text-align: center;
-            color: #475569;
         }
 
-        .empty-visual {
-            width: min(100%, 620px);
-            height: 250px;
-            margin: 0 auto 26px;
+        .empty-icon {
+            width: 82px;
+            height: 82px;
+            margin: 0 auto 18px;
             border-radius: 28px;
-            background:
-                linear-gradient(rgba(15, 23, 42, 0.20), rgba(15, 23, 42, 0.35)),
-                url("https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1400&q=80");
-            background-size: cover;
-            background-position: center;
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
+            display: grid;
+            place-items: center;
+            color: white;
+            font-size: 34px;
+            background: linear-gradient(135deg, var(--blue), var(--violet));
+            box-shadow: 0 18px 42px rgba(37,99,235,0.24);
         }
 
         .section-title {
-            margin: 0 0 8px;
-            font-size: 28px;
-            letter-spacing: -0.8px;
+            margin: 0;
+            font-size: 30px;
+            letter-spacing: -0.9px;
         }
 
         .section-subtitle {
-            margin: 0 auto;
-            max-width: 700px;
+            max-width: 720px;
+            margin: 10px auto 0;
             color: var(--muted);
-            line-height: 1.65;
+            line-height: 1.7;
+        }
+
+        .workflow-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin: 30px auto 0;
+            max-width: 920px;
+        }
+
+        .workflow-card {
+            padding: 20px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border: 1px solid var(--border);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workflow-card::before {
+            content: "";
+            position: absolute;
+            width: 96px;
+            height: 96px;
+            right: -42px;
+            top: -42px;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.16), transparent 68%);
+        }
+
+        .workflow-icon {
+            width: 42px;
+            height: 42px;
+            margin-bottom: 14px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            color: white;
+            background: linear-gradient(135deg, var(--blue), var(--violet));
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+            font-weight: 950;
+        }
+
+        .workflow-card strong {
+            display: block;
+            margin-bottom: 7px;
+            color: #0f172a;
+            font-size: 15px;
+        }
+
+        .workflow-card span {
+            display: block;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.55;
         }
 
         .result-card {
@@ -417,31 +625,59 @@
         .result-header {
             padding: 24px 28px;
             border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            background: rgba(248, 250, 252, 0.88);
+            align-items: flex-start;
+            gap: 14px;
         }
 
         .result-header h2 {
             margin: 0;
-            font-size: 24px;
-            letter-spacing: -0.6px;
+            font-size: 25px;
+            letter-spacing: -0.7px;
         }
 
-        .retrieved-status {
-            font-size: 13px;
-            font-weight: 900;
+        .question-echo {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .status-badge {
+            flex-shrink: 0;
             padding: 8px 12px;
             border-radius: 999px;
             background: #dcfce7;
             color: #166534;
+            font-weight: 900;
+            font-size: 13px;
+        }
+
+        .answer-toolbar {
+            padding: 18px 28px 0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .light-btn {
+            padding: 10px 12px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #3730a3;
+            border: 1px solid #e0e7ff;
+            font-size: 13px;
+        }
+
+        .light-btn:hover {
+            background: #e0e7ff;
         }
 
         .answer {
-            padding: 30px;
-            font-size: 18px;
+            padding: 24px 30px 30px;
+            font-size: 17px;
             line-height: 1.85;
             white-space: pre-wrap;
         }
@@ -450,108 +686,192 @@
             padding: 0 30px 30px;
         }
 
-        .sources h3 {
-            margin: 10px 0 16px;
-            font-size: 19px;
+        .source-headline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            margin: 4px 0 16px;
+        }
+
+        .source-headline h3 {
+            margin: 0;
+            font-size: 21px;
+            letter-spacing: -0.4px;
+        }
+
+        .source-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         details {
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            background: white;
             margin-bottom: 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: white;
             overflow: hidden;
         }
 
         summary {
+            list-style: none;
             cursor: pointer;
             padding: 17px 19px;
-            font-weight: 900;
-            color: #334155;
             background: linear-gradient(135deg, #f8fafc, #eef2ff);
         }
 
-        .chunk-body {
-            padding: 19px;
-            color: #475569;
-            line-height: 1.72;
-            white-space: pre-wrap;
+        summary::-webkit-details-marker {
+            display: none;
         }
 
-        .metadata {
-            margin-top: 14px;
-            padding: 14px;
-            border-radius: 15px;
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .source-title-line {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
+
+        .source-number {
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 950;
+        }
+
+        .source-name {
+            font-weight: 950;
+            color: #1e293b;
+        }
+
+        .source-subline {
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .score-pill {
+            padding: 8px 10px;
+            border-radius: 999px;
             background: #f1f5f9;
             color: #334155;
+            font-weight: 900;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .chunk-body {
+            padding: 20px;
+            color: #475569;
+            line-height: 1.72;
+        }
+
+        .chunk-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .meta-tile {
+            padding: 13px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            min-width: 0;
+        }
+
+        .meta-label {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 950;
+        }
+
+        .meta-value {
+            margin-top: 5px;
+            color: #1e293b;
             font-size: 13px;
-            overflow-x: auto;
+            font-weight: 800;
+            overflow-wrap: anywhere;
         }
 
         .source-link {
-            color: var(--primary);
-            font-weight: 800;
+            color: var(--blue);
             text-decoration: none;
+            font-weight: 900;
         }
 
         .source-link:hover {
             text-decoration: underline;
         }
 
-        pre {
-            margin: 8px 0 0;
+        .preview-box {
+            margin-top: 10px;
+            padding: 16px;
+            border-radius: 16px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
             white-space: pre-wrap;
+            color: #334155;
         }
 
-        /* ABOUT PAGE */
+        .raw-metadata {
+            margin-top: 13px;
+            padding: 14px;
+            border-radius: 16px;
+            background: #0f172a;
+            color: #dbeafe;
+            overflow-x: auto;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            font-size: 12px;
+            line-height: 1.55;
+        }
 
         .about-hero {
-            min-height: 72vh;
-            padding: 132px 22px 70px;
-            position: relative;
+            padding: 132px 0 74px;
+            color: white;
             background:
-                linear-gradient(rgba(2, 6, 23, 0.72), rgba(2, 6, 23, 0.66)),
-                url("https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=2200&q=80");
+                linear-gradient(90deg, rgba(2, 6, 23, 0.94), rgba(15, 23, 42, 0.78)),
+                url("https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=2200&q=85");
             background-size: cover;
             background-position: center;
         }
 
-        .about-hero-inner {
-            max-width: 1220px;
-            margin: 0 auto;
-            color: white;
-        }
-
         .about-hero h1 {
-            max-width: 920px;
+            max-width: 940px;
         }
 
-        .about-hero p {
-            max-width: 790px;
-            color: rgba(255, 255, 255, 0.78);
-            font-size: 19px;
-            line-height: 1.75;
-            margin-top: 24px;
+        .about-hero .lead {
+            max-width: 860px;
         }
 
         .about-content {
+            padding: 64px 0 82px;
             background:
-                radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 28%),
-                radial-gradient(circle at bottom right, rgba(124, 58, 237, 0.13), transparent 28%),
+                radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(124, 58, 237, 0.10), transparent 28%),
                 #f8fafc;
-            padding: 58px 20px 80px;
-        }
-
-        .about-inner {
-            max-width: 1220px;
-            margin: 0 auto;
         }
 
         .about-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 22px;
-            margin-bottom: 28px;
         }
 
         .about-card {
@@ -559,7 +879,7 @@
             border-radius: 30px;
             background: white;
             border: 1px solid var(--border);
-            box-shadow: var(--soft-shadow);
+            box-shadow: var(--shadow);
         }
 
         .about-card.wide {
@@ -568,7 +888,7 @@
 
         .about-card h2 {
             margin: 0 0 12px;
-            font-size: 28px;
+            font-size: 27px;
             letter-spacing: -0.8px;
         }
 
@@ -576,24 +896,56 @@
             margin: 0;
             color: #475569;
             line-height: 1.75;
-            font-size: 16px;
         }
 
-        .pill-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+        .capability-grid,
+        .tech-grid,
+        .value-grid {
+            display: grid;
+            gap: 12px;
             margin-top: 18px;
         }
 
+        .capability-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .tech-grid {
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        .value-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .mini-card {
+            padding: 17px;
+            border-radius: 20px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+        }
+
+        .mini-card strong {
+            display: block;
+            margin-bottom: 7px;
+            color: #1e293b;
+        }
+
+        .mini-card span {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
         .tech-pill {
-            padding: 9px 12px;
+            padding: 11px 12px;
             border-radius: 999px;
+            text-align: center;
             background: #eef2ff;
             color: #3730a3;
-            font-size: 13px;
-            font-weight: 850;
             border: 1px solid #e0e7ff;
+            font-size: 13px;
+            font-weight: 900;
         }
 
         .pipeline {
@@ -604,13 +956,13 @@
 
         .pipeline-step {
             display: grid;
-            grid-template-columns: 58px 1fr;
+            grid-template-columns: 56px 1fr;
             gap: 16px;
             align-items: start;
             padding: 18px;
             border-radius: 22px;
-            border: 1px solid var(--border);
             background: #f8fafc;
+            border: 1px solid var(--border);
         }
 
         .step-number {
@@ -621,7 +973,7 @@
             place-items: center;
             color: white;
             font-weight: 950;
-            background: linear-gradient(135deg, var(--primary), var(--purple));
+            background: linear-gradient(135deg, var(--blue), var(--violet));
             box-shadow: 0 12px 30px rgba(37, 99, 235, 0.25);
         }
 
@@ -636,131 +988,117 @@
             line-height: 1.5;
         }
 
-        .split-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-            margin-top: 20px;
-        }
-
-        .split-card {
-            padding: 18px;
-            border-radius: 22px;
-            background: #f8fafc;
+        .eval-table {
+            width: 100%;
+            margin-top: 18px;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 18px;
             border: 1px solid var(--border);
         }
 
-        .split-card strong {
-            display: block;
-            margin-bottom: 7px;
+        .eval-table th,
+        .eval-table td {
+            padding: 13px 15px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
         }
 
-        .split-card span {
-            color: var(--muted);
-            line-height: 1.5;
-            font-size: 14px;
+        .eval-table th {
+            background: #f8fafc;
+            color: #334155;
         }
 
-        .about-image-strip {
-            margin-top: 28px;
-            min-height: 300px;
-            border-radius: 32px;
-            background:
-                linear-gradient(rgba(15, 23, 42, 0.18), rgba(15, 23, 42, 0.48)),
-                url("https://images.unsplash.com/photo-1554224154-26032ffc0d07?auto=format&fit=crop&w=1800&q=80");
-            background-size: cover;
-            background-position: center;
-            box-shadow: var(--soft-shadow);
+        .eval-table td:last-child {
+            font-weight: 950;
+            color: #0f172a;
+        }
+
+        .eval-table tr:last-child td {
+            border-bottom: none;
         }
 
         .footer {
-            text-align: center;
             padding: 24px 20px;
-            color: #94a3b8;
+            text-align: center;
             background: #020617;
+            color: #94a3b8;
             font-size: 14px;
         }
 
-        .loader {
-            width: 18px;
-            height: 18px;
-            border: 3px solid rgba(255, 255, 255, 0.5);
-            border-top-color: white;
-            border-radius: 50%;
-            display: inline-block;
-            animation: spin 0.8s linear infinite;
-            vertical-align: middle;
-            margin-right: 8px;
+        .footer strong {
+            color: #e2e8f0;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @media (max-width: 940px) {
-            .about-grid,
-            .split-grid {
+        @media (max-width: 1050px) {
+            .hero-grid {
                 grid-template-columns: 1fr;
             }
 
-            .nav {
-                align-items: flex-start;
-                flex-direction: column;
+            .chunk-meta-grid,
+            .capability-grid,
+            .value-grid {
+                grid-template-columns: 1fr;
             }
 
-            .nav-actions {
-                width: 100%;
-                flex-wrap: wrap;
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 760px) {
+            .shell {
+                width: min(100% - 26px, 1220px);
+            }
+
+            .nav {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .brand-title,
+            .brand-subtitle {
+                white-space: normal;
+            }
+
             .hero,
             .about-hero {
-                padding: 150px 14px 42px;
+                padding-top: 176px;
+                background-attachment: scroll;
             }
 
             h1 {
-                letter-spacing: -1.5px;
+                letter-spacing: -1.7px;
             }
 
-            .chat-card {
-                padding: 16px;
+            .executive-metrics,
+            .workflow-preview,
+            .about-grid {
+                grid-template-columns: 1fr;
             }
 
-            .chat-header {
+            .executive-strip-title {
                 flex-direction: column;
                 align-items: flex-start;
             }
 
             .actions {
-                flex-direction: column;
-            }
-
-            button {
-                width: 100%;
-            }
-
-            .examples {
-                display: grid;
                 grid-template-columns: 1fr;
             }
 
-            .result-header {
+            .chat-top,
+            .result-header,
+            .source-headline,
+            .summary-grid {
+                grid-template-columns: 1fr;
                 flex-direction: column;
                 align-items: flex-start;
             }
 
+            .about-card,
             .answer,
-            .sources,
-            .about-card {
+            .sources {
                 padding: 22px;
-            }
-
-            .empty-visual {
-                height: 200px;
             }
 
             .pipeline-step {
@@ -774,74 +1112,120 @@
     <div class="nav-shell">
         <nav class="nav">
             <div class="brand">
-                <div class="logo">⚖️</div>
+                <div class="brand-mark">AI</div>
                 <div>
                     <div class="brand-title">EU Regulatory Compliance Assistant</div>
-                    <div class="brand-subtitle">Databricks · Azure AI Search · GPT-4o RAG</div>
+                    <div class="brand-subtitle">Databricks · Gold Embeddings · Azure AI Search · GPT-4o RAG</div>
                 </div>
             </div>
 
             <div class="nav-actions">
-                <button class="nav-btn active" id="chatNavBtn" onclick="showPage('chat')">Chat</button>
-                <button class="nav-btn" id="aboutNavBtn" onclick="showPage('about')">About Project</button>
+                <button class="nav-btn active" id="chatNavBtn" onclick="showPage('chat')">Assistant</button>
+                <button class="nav-btn" id="aboutNavBtn" onclick="showPage('about')">Project Overview</button>
                 <div class="status-pill" id="apiStatus">API: checking...</div>
             </div>
         </nav>
     </div>
 
-    <!-- CHAT PAGE -->
     <main class="page active" id="chatPage">
         <section class="hero">
-            <div class="hero-inner">
-                <div class="hero-content">
-                    <div class="badge">AI-powered compliance intelligence</div>
-                    <h1>Understand regulation faster.</h1>
-                    <p class="hero-text">
-                        Ask questions across GDPR, DORA, PSD2, MiFID II, the EU AI Act, and other
-                        regulatory documents. Get grounded answers with retrieved sources, page numbers,
-                        document titles, and source links.
-                    </p>
+            <div class="shell">
+                <div class="hero-grid">
+                    <div>
+                        <div class="eyebrow">
+                            <span class="pulse-dot"></span>
+                            Live regulatory RAG assistant
+                        </div>
+
+                        <h1>Grounded answers for EU compliance teams.</h1>
+
+                        <p class="lead">
+                            Ask natural-language questions across GDPR, DORA, PSD2, MiFID II, and the EU AI Act.
+                            The assistant retrieves regulatory evidence from Azure AI Search and generates
+                            source-grounded answers using GPT-4o.
+                        </p>
+
+                        <div class="executive-strip">
+                            <div class="executive-strip-title">
+                                <span>System readiness</span>
+                                <span>Final evaluation and indexing status</span>
+                            </div>
+
+                            <div class="executive-metrics">
+                                <div class="executive-metric-card">
+                                    <div class="executive-metric-icon">◈</div>
+                                    <div class="executive-metric-value">2,733</div>
+                                    <div class="executive-metric-label">Gold embedded chunks indexed in Azure AI Search</div>
+                                </div>
+
+                                <div class="executive-metric-card">
+                                    <div class="executive-metric-icon">✓</div>
+                                    <div class="executive-metric-value">12/12</div>
+                                    <div class="executive-metric-label">Evaluation questions passed successfully</div>
+                                </div>
+
+                                <div class="executive-metric-card">
+                                    <div class="executive-metric-icon">★</div>
+                                    <div class="executive-metric-value">4.917/5</div>
+                                    <div class="executive-metric-label">Average faithfulness and groundedness score</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="chat-shell">
                         <div class="chat-card">
-                            <div class="chat-header">
-                                <div class="chat-title">
-                                    <span class="chat-dot"></span>
-                                    Compliance chat
+                            <div class="chat-top">
+                                <div>
+                                    <div class="chat-title">Ask a regulatory question</div>
+                                    <div class="chat-caption">Hybrid retrieval · source traceability · PII redaction</div>
                                 </div>
-                                <div class="chat-mode">Live RAG backend · Azure AI Search</div>
+
+                                <div class="top-k">
+                                    <span>Sources</span>
+                                    <select id="topKSelect">
+                                        <option value="3">3</option>
+                                        <option value="5" selected>5</option>
+                                        <option value="8">8</option>
+                                        <option value="10">10</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <textarea
                                 id="questionInput"
-                                placeholder="Ask something like: According to GDPR, what obligations do controllers have for personal data protection?"
+                                placeholder="Example: According to GDPR, what obligations do controllers have for personal data protection?"
                             ></textarea>
 
                             <div class="actions">
-                                <button class="primary-btn" id="askBtn" onclick="askQuestion()">
-                                    Ask assistant
-                                </button>
-
-                                <button class="secondary-btn" onclick="clearAll()">
-                                    Clear
-                                </button>
+                                <button class="primary-btn" id="askBtn" onclick="askQuestion()">Ask assistant</button>
+                                <button class="secondary-btn" onclick="clearAll()">Clear</button>
+                                <button class="secondary-btn" onclick="copyAnswer()">Copy answer</button>
                             </div>
 
                             <div class="examples">
                                 <div class="example-chip" onclick="setExample('According to GDPR, what obligations do controllers have for personal data protection?')">
                                     GDPR controller obligations
                                 </div>
-                                <div class="example-chip" onclick="setExample('What does DORA require from financial entities?')">
-                                    DORA financial entities
+
+                                <div class="example-chip" onclick="setExample('What kind of operational resilience does DORA focus on?')">
+                                    DORA operational resilience
                                 </div>
+
                                 <div class="example-chip" onclick="setExample('What is the purpose of PSD2?')">
                                     PSD2 purpose
                                 </div>
+
                                 <div class="example-chip" onclick="setExample('How does MiFID II relate to investor protection?')">
                                     MiFID II investor protection
                                 </div>
-                                <div class="example-chip" onclick="setExample('What are the risk management ideas in the EU AI Act?')">
-                                    AI Act risk management
+
+                                <div class="example-chip" onclick="setExample('What does the AI Act say about high-risk AI systems?')">
+                                    AI Act high-risk systems
+                                </div>
+
+                                <div class="example-chip" onclick="setExample('My email is maria.test@example.com. What does GDPR say about the protection of personal data?')">
+                                    PII redaction test
                                 </div>
                             </div>
 
@@ -853,27 +1237,63 @@
         </section>
 
         <section class="results-section" id="results">
-            <div class="results-inner">
+            <div class="shell">
                 <section class="empty-card" id="emptyState">
-                    <div class="empty-visual"></div>
-                    <h2 class="section-title">Your answer will appear here</h2>
+                    <div class="empty-icon">↳</div>
+
+                    <h2 class="section-title">Ask a question to begin</h2>
+
                     <p class="section-subtitle">
-                        The assistant will display a generated answer followed by retrieved regulatory
-                        sources, including document title, page number, file name, source URL, score,
-                        and chunk preview.
+                        The assistant will retrieve regulatory evidence, generate a grounded response,
+                        and display the source material used to support the answer.
                     </p>
+
+                    <div class="workflow-preview">
+                        <div class="workflow-card">
+                            <div class="workflow-icon">1</div>
+                            <strong>Retrieve evidence</strong>
+                            <span>Hybrid search finds relevant regulatory chunks from Azure AI Search using keyword and vector retrieval.</span>
+                        </div>
+
+                        <div class="workflow-card">
+                            <div class="workflow-icon">2</div>
+                            <strong>Generate answer</strong>
+                            <span>GPT-4o uses the retrieved context to produce a concise, compliance-oriented response.</span>
+                        </div>
+
+                        <div class="workflow-card">
+                            <div class="workflow-icon">3</div>
+                            <strong>Show traceability</strong>
+                            <span>Each answer includes source title, file name, page number, retrieval score, and document URL.</span>
+                        </div>
+                    </div>
                 </section>
 
                 <section class="result-card" id="resultCard">
                     <div class="result-header">
-                        <h2>Generated answer</h2>
-                        <span class="retrieved-status" id="statusBadge">Retrieved from Azure AI Search</span>
+                        <div>
+                            <h2>Generated answer</h2>
+                            <div class="question-echo" id="questionEcho"></div>
+                        </div>
+
+                        <span class="status-badge" id="statusBadge">Sources retrieved</span>
+                    </div>
+
+                    <div class="answer-toolbar">
+                        <button class="light-btn" onclick="copyAnswer()">Copy answer</button>
                     </div>
 
                     <div class="answer" id="answerBox"></div>
 
                     <div class="sources">
-                        <h3>Retrieved sources</h3>
+                        <div class="source-headline">
+                            <h3>Retrieved sources</h3>
+                            <div class="source-actions">
+                                <button class="light-btn" onclick="expandAllSources()">Expand all</button>
+                                <button class="light-btn" onclick="collapseAllSources()">Collapse all</button>
+                            </div>
+                        </div>
+
                         <div id="chunksBox"></div>
                     </div>
                 </section>
@@ -881,60 +1301,61 @@
         </section>
     </main>
 
-    <!-- ABOUT PAGE -->
     <main class="page" id="aboutPage">
         <section class="about-hero">
-            <div class="about-hero-inner">
-                <div class="badge">Project overview</div>
-                <h1>Built for governed regulatory intelligence.</h1>
-                <p>
-                    This project implements an AI-powered compliance assistant for EU financial
-                    institutions. It combines regulatory document ingestion, Databricks data
-                    engineering, Delta tables, Azure OpenAI embeddings, Azure AI Search, FastAPI,
-                    and retrieval-augmented generation into one end-to-end knowledge platform.
+            <div class="shell">
+                <div class="eyebrow">
+                    <span class="pulse-dot"></span>
+                    Project overview
+                </div>
+
+                <h1>AI Knowledge Engineering for regulatory compliance.</h1>
+
+                <p class="lead">
+                    This project implements an end-to-end AI-powered regulatory compliance assistant
+                    for EU financial institutions. It combines governed data engineering, Gold embedding
+                    generation, vector search, hybrid retrieval, source-grounded generation, PII handling,
+                    Dockerized application execution, and automated RAG evaluation.
                 </p>
             </div>
         </section>
 
         <section class="about-content">
-            <div class="about-inner">
+            <div class="shell">
                 <div class="about-grid">
                     <div class="about-card">
-                        <h2>Business problem</h2>
+                        <h2>Business challenge</h2>
                         <p>
-                            Financial institutions must continuously understand and comply with complex
-                            EU regulations such as GDPR, DORA, PSD2, MiFID II, and the EU AI Act.
-                            Traditional keyword search is often not enough because compliance questions
-                            require context, semantic retrieval, and traceable answers.
+                            EU financial institutions must continuously interpret complex regulations such as
+                            GDPR, DORA, PSD2, MiFID II, and the EU AI Act. Compliance teams need fast,
+                            contextual, and traceable access to regulatory obligations, controls, and requirements.
                         </p>
                     </div>
 
                     <div class="about-card">
-                        <h2>Project objective</h2>
+                        <h2>Solution objective</h2>
                         <p>
-                            The goal is to provide a regulatory compliance assistant that accepts
-                            natural-language questions and returns grounded answers based on retrieved
-                            regulatory chunks, with clear references to the source regulation, file,
-                            page number, and URL.
+                            The assistant enables users to ask natural-language compliance questions and receive
+                            grounded answers supported by retrieved regulatory sources, metadata, page numbers,
+                            file names, and official source URLs.
                         </p>
                     </div>
 
                     <div class="about-card wide">
                         <h2>Implemented architecture</h2>
                         <p>
-                            The system uses Databricks as the governed data engineering layer and Azure
-                            AI Search as the application retrieval layer. Raw regulatory files are
-                            uploaded to Databricks, transformed into Bronze/Silver/Gold Delta tables,
-                            embedded through Azure OpenAI, indexed in Azure AI Search, and queried by
-                            a FastAPI backend connected to this frontend.
+                            The solution uses Databricks for governed document processing, Delta Lake for
+                            Bronze/Silver/Gold tables, Azure OpenAI for Gold embedding generation and GPT-4o
+                            answer generation, Azure AI Search for hybrid retrieval, Docker for local application
+                            execution, and FastAPI for the API layer.
                         </p>
 
                         <div class="pipeline">
                             <div class="pipeline-step">
                                 <div class="step-number">1</div>
                                 <div>
-                                    <strong>Document acquisition</strong>
-                                    <span>Regulatory documents are collected from EUR-Lex and other official EU sources in PDF, HTML, and XML formats.</span>
+                                    <strong>Regulatory document acquisition</strong>
+                                    <span>PDF, HTML, and XML regulatory documents are collected or registered from official EU sources.</span>
                                 </div>
                             </div>
 
@@ -942,7 +1363,7 @@
                                 <div class="step-number">2</div>
                                 <div>
                                     <strong>Metadata manifest</strong>
-                                    <span>A manifest tracks CELEX ID, short title, regulation title, source URL, file format, SHA256 hash, and ingestion status.</span>
+                                    <span>A manifest tracks regulation title, short title, CELEX identifier, source URL, file format, and lineage information.</span>
                                 </div>
                             </div>
 
@@ -950,120 +1371,224 @@
                                 <div class="step-number">3</div>
                                 <div>
                                     <strong>Databricks Volume</strong>
-                                    <span>Raw regulatory files and metadata are uploaded to a Unity Catalog Volume for governed storage.</span>
+                                    <span>Raw files and metadata are uploaded into a Unity Catalog Volume for governed cloud storage.</span>
                                 </div>
                             </div>
 
                             <div class="pipeline-step">
                                 <div class="step-number">4</div>
                                 <div>
-                                    <strong>Bronze tables</strong>
-                                    <span>The Bronze job extracts raw document text and stores document-level and page-level regulatory data in Delta tables.</span>
+                                    <strong>Bronze ingestion</strong>
+                                    <span>Databricks extracts text from PDFs, HTML, and XML files and stores document-level and page-level records.</span>
                                 </div>
                             </div>
 
                             <div class="pipeline-step">
                                 <div class="step-number">5</div>
                                 <div>
-                                    <strong>Silver chunks</strong>
-                                    <span>The Silver job splits extracted text into overlapping, AI-ready chunks while preserving metadata and lineage.</span>
+                                    <strong>Silver chunking</strong>
+                                    <span>Extracted text is split into overlapping AI-ready chunks while preserving metadata and source provenance.</span>
                                 </div>
                             </div>
 
                             <div class="pipeline-step">
                                 <div class="step-number">6</div>
                                 <div>
-                                    <strong>Gold retrieval table</strong>
-                                    <span>The Gold job prepares clean chunks and metadata such as short title, regulation title, source URL, page number, and file name.</span>
+                                    <strong>Gold embedding generation</strong>
+                                    <span>The Gold job generates embeddings using Azure OpenAI and writes chunk text, metadata, and vectors to the Gold Delta table.</span>
                                 </div>
                             </div>
 
                             <div class="pipeline-step">
                                 <div class="step-number">7</div>
                                 <div>
-                                    <strong>Azure AI Search index</strong>
-                                    <span>The pipeline creates an Azure AI Search vector index and uploads embedded chunks using Azure OpenAI text-embedding-3-small.</span>
+                                    <strong>Azure AI Search upload</strong>
+                                    <span>The upload job reads existing Gold embeddings and uploads chunk text, metadata, and vectors to Azure AI Search.</span>
                                 </div>
                             </div>
 
                             <div class="pipeline-step">
                                 <div class="step-number">8</div>
                                 <div>
-                                    <strong>FastAPI RAG service</strong>
-                                    <span>The backend exposes a /ask endpoint that embeds the question, retrieves relevant sources, and generates an answer using GPT-4o.</span>
+                                    <strong>RAG API and frontend</strong>
+                                    <span>FastAPI exposes the /ask endpoint and this frontend displays grounded answers with retrieved evidence.</span>
                                 </div>
                             </div>
-
-                            <div class="pipeline-step">
-                                <div class="step-number">9</div>
-                                <div>
-                                    <strong>Frontend interface</strong>
-                                    <span>The web interface lets users ask compliance questions and inspect the retrieved evidence behind each answer.</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="about-card">
-                        <h2>Current status</h2>
-                        <p>
-                            The end-to-end pipeline has been completed. The Databricks Bundle runs
-                            Bronze ingestion, Silver chunking, Gold preparation, Azure AI Search index
-                            creation, Azure OpenAI embedding generation, and document upload. The
-                            FastAPI backend successfully answers questions through the /ask endpoint.
-                        </p>
-                    </div>
-
-                    <div class="about-card">
-                        <h2>Technologies used</h2>
-                        <p>
-                            The implementation combines Python, uv, FastAPI, Databricks, Unity Catalog,
-                            Delta Lake, Databricks Bundles, PySpark, Azure OpenAI, Azure AI Search,
-                            GPT-4o, and a modern HTML/CSS/JavaScript frontend.
-                        </p>
-
-                        <div class="pill-row">
-                            <span class="tech-pill">Python</span>
-                            <span class="tech-pill">FastAPI</span>
-                            <span class="tech-pill">Databricks</span>
-                            <span class="tech-pill">Delta Lake</span>
-                            <span class="tech-pill">Unity Catalog</span>
-                            <span class="tech-pill">PySpark</span>
-                            <span class="tech-pill">Azure OpenAI</span>
-                            <span class="tech-pill">Azure AI Search</span>
-                            <span class="tech-pill">GPT-4o</span>
-                            <span class="tech-pill">RAG</span>
                         </div>
                     </div>
 
                     <div class="about-card wide">
-                        <h2>Component responsibilities</h2>
-                        <p>
-                            The solution is split into three main layers. Databricks handles governed
-                            ingestion and transformation, Azure handles embeddings and vector search,
-                            and the FastAPI/frontend layer exposes the final assistant to users.
-                        </p>
+                        <h2>Implemented capabilities</h2>
 
-                        <div class="split-grid">
-                            <div class="split-card">
-                                <strong>Data engineering</strong>
-                                <span>Downloader, uploader, manifest, Databricks Volume, Bronze/Silver/Gold Delta tables.</span>
+                        <div class="capability-grid">
+                            <div class="mini-card">
+                                <strong>Governed ingestion</strong>
+                                <span>Raw regulatory documents are stored and processed through Databricks and Delta tables.</span>
                             </div>
 
-                            <div class="split-card">
-                                <strong>AI retrieval</strong>
-                                <span>Azure OpenAI embeddings, Azure AI Search indexing, semantic retrieval, and GPT-4o generation.</span>
+                            <div class="mini-card">
+                                <strong>AI-ready chunking</strong>
+                                <span>Long regulatory documents are converted into structured chunks with metadata and lineage.</span>
                             </div>
 
-                            <div class="split-card">
-                                <strong>Application layer</strong>
-                                <span>FastAPI /ask endpoint, frontend interface, source rendering, and final RAG integration.</span>
+                            <div class="mini-card">
+                                <strong>Gold embeddings</strong>
+                                <span>Azure OpenAI embeddings are generated in the Gold layer and reused during Azure AI Search upload.</span>
+                            </div>
+
+                            <div class="mini-card">
+                                <strong>Hybrid retrieval</strong>
+                                <span>Azure AI Search combines keyword and vector retrieval for more reliable regulatory search.</span>
+                            </div>
+
+                            <div class="mini-card">
+                                <strong>Source-grounded answers</strong>
+                                <span>GPT-4o generates answers using retrieved source context and source labels.</span>
+                            </div>
+
+                            <div class="mini-card">
+                                <strong>PII redaction</strong>
+                                <span>User questions are checked for emails, phones, IBAN-like values, and card-like numbers.</span>
+                            </div>
+
+                            <div class="mini-card">
+                                <strong>Dockerized API</strong>
+                                <span>The local FastAPI application layer runs through Docker Compose for reproducible demos.</span>
+                            </div>
+
+                            <div class="mini-card">
+                                <strong>Automated evaluation</strong>
+                                <span>The RAG pipeline is evaluated using retrieval checks and LLM-as-judge groundedness scoring.</span>
+                            </div>
+
+                            <div class="mini-card">
+                                <strong>Source traceability</strong>
+                                <span>Returned answers include regulation title, file name, source URL, page number, and retrieval score.</span>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="about-image-strip"></div>
+                    <div class="about-card">
+                        <h2>Technology stack</h2>
+                        <p>
+                            The project uses a modern AI and data engineering stack suitable for an enterprise
+                            knowledge engineering prototype.
+                        </p>
+
+                        <div class="tech-grid">
+                            <div class="tech-pill">Python</div>
+                            <div class="tech-pill">FastAPI</div>
+                            <div class="tech-pill">Databricks</div>
+                            <div class="tech-pill">Delta Lake</div>
+                            <div class="tech-pill">PySpark</div>
+                            <div class="tech-pill">Azure OpenAI</div>
+                            <div class="tech-pill">Azure AI Search</div>
+                            <div class="tech-pill">GPT-4o</div>
+                            <div class="tech-pill">Docker</div>
+                            <div class="tech-pill">RAG</div>
+                        </div>
+                    </div>
+
+                    <div class="about-card">
+                        <h2>Dockerized application layer</h2>
+                        <p>
+                            The local FastAPI backend and RAG service are Dockerized using Docker Compose.
+                            Databricks, Azure OpenAI, and Azure AI Search remain external managed cloud services.
+                            Runtime configuration is injected through the `.env` file and is not copied into the image.
+                        </p>
+                    </div>
+
+                    <div class="about-card wide">
+                        <h2>Evaluation results</h2>
+                        <p>
+                            The final evaluation dataset contains 12 representative questions covering GDPR,
+                            DORA, PSD2, MiFID II, and the EU AI Act. It includes direct regulation-specific
+                            questions, broader compliance questions, a PII-containing question, and
+                            regulation-identification questions.
+                        </p>
+
+                        <table class="eval-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td>Total questions</td>
+                                    <td>12</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Passed questions</td>
+                                    <td>12</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Pass rate</td>
+                                    <td>100%</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Expected regulation found</td>
+                                    <td>12 / 12</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Top source matched expected regulation</td>
+                                    <td>12 / 12</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Average keyword coverage</td>
+                                    <td>95.8%</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Average faithfulness score</td>
+                                    <td>4.917 / 5</td>
+                                </tr>
+
+                                <tr>
+                                    <td>Groundedness pass count</td>
+                                    <td>12 / 12</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="about-card wide">
+                        <h2>Business value</h2>
+
+                        <div class="value-grid">
+                            <div class="mini-card">
+                                <strong>Faster compliance research</strong>
+                                <span>Users can ask questions directly instead of manually searching long regulatory PDFs.</span>
+                            </div>
+
+                            <div class="mini-card">
+                                <strong>Improved traceability</strong>
+                                <span>Every answer is connected to retrieved source metadata, page numbers, and source URLs.</span>
+                            </div>
+
+                            <div class="mini-card">
+                                <strong>Governed AI foundation</strong>
+                                <span>The architecture supports responsible AI controls, source grounding, PII handling, and evaluation.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-card wide">
+                        <h2>Production improvements</h2>
+                        <p>
+                            Future improvements include Azure Key Vault integration, enterprise authentication
+                            with OAuth2 or Azure AD, semantic reranking, regulation-specific filters, expanded
+                            evaluation datasets, observability dashboards, and cloud deployment of the API/frontend.
+                        </p>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
@@ -1075,8 +1600,10 @@
     <script>
         const API_BASE_URL = "http://127.0.0.1:8000";
         const QUERY_URL = `${API_BASE_URL}/ask`;
-        const APP_API_KEY = "demo-secret-key";  
+        const APP_API_KEY = "demo-secret-key";
+
         const questionInput = document.getElementById("questionInput");
+        const topKSelect = document.getElementById("topKSelect");
         const askBtn = document.getElementById("askBtn");
         const answerBox = document.getElementById("answerBox");
         const chunksBox = document.getElementById("chunksBox");
@@ -1085,6 +1612,8 @@
         const errorBox = document.getElementById("errorBox");
         const apiStatus = document.getElementById("apiStatus");
         const endpointLabel = document.getElementById("endpointLabel");
+        const statusBadge = document.getElementById("statusBadge");
+        const questionEcho = document.getElementById("questionEcho");
 
         endpointLabel.textContent = QUERY_URL;
 
@@ -1124,6 +1653,7 @@
             questionInput.value = "";
             answerBox.textContent = "";
             chunksBox.innerHTML = "";
+            questionEcho.textContent = "";
             errorBox.style.display = "none";
             resultCard.style.display = "none";
             emptyState.style.display = "block";
@@ -1153,9 +1683,10 @@
 
         async function askQuestion() {
             const question = questionInput.value.trim();
+            const topK = Number(topKSelect.value || 5);
 
             if (!question) {
-                showError("Please type a question first.");
+                showError("Please type a compliance question first.");
                 return;
             }
 
@@ -1165,17 +1696,18 @@
             emptyState.style.display = "none";
             answerBox.textContent = "";
             chunksBox.innerHTML = "";
+            questionEcho.textContent = question;
 
             try {
                 const response = await fetch(QUERY_URL, {
                     method: "POST",
                     headers: {
-                         "Content-Type": "application/json",
-                         "X-API-Key": APP_API_KEY,
+                        "Content-Type": "application/json",
+                        "X-API-Key": APP_API_KEY,
                     },
                     body: JSON.stringify({
                         question: question,
-                        top_k: 5,
+                        top_k: topK,
                     }),
                 });
 
@@ -1205,6 +1737,7 @@
             answerBox.textContent = data.answer || "No answer returned.";
 
             const sources = data.sources || [];
+            statusBadge.textContent = `${sources.length} source${sources.length === 1 ? "" : "s"} retrieved`;
 
             if (sources.length === 0) {
                 chunksBox.innerHTML = "<p class='section-subtitle'>No sources were returned.</p>";
@@ -1212,11 +1745,11 @@
             }
 
             chunksBox.innerHTML = sources.map((source, index) => {
-                const preview = escapeHtml(source.chunk_preview || "No preview available.");
                 const sourceNumber = source.source_number || index + 1;
                 const shortTitle = source.short_title || "Unknown document";
                 const regulationTitle = source.regulation_title || "N/A";
                 const fileName = source.file_name || "N/A";
+                const preview = source.chunk_preview || "No preview available.";
 
                 const pageNumber = source.page_number !== null && source.page_number !== undefined
                     ? `Page ${source.page_number}`
@@ -1227,8 +1760,8 @@
                     : "N/A";
 
                 const sourceUrl = source.source_url
-                    ? `<p><strong>Source URL:</strong> <a class="source-link" href="${escapeHtml(source.source_url)}" target="_blank" rel="noopener noreferrer">Open regulatory document</a></p>`
-                    : "";
+                    ? `<a class="source-link" href="${escapeHtml(source.source_url)}" target="_blank" rel="noopener noreferrer">Open source document</a>`
+                    : "N/A";
 
                 const metadata = {
                     chunk_id: source.chunk_id,
@@ -1240,32 +1773,54 @@
                     score: source.score,
                 };
 
-                const metadataPretty = escapeHtml(JSON.stringify(metadata, null, 2));
-
                 return `
-                    <details>
+                    <details ${index === 0 ? "open" : ""}>
                         <summary>
-                            Source ${escapeHtml(String(sourceNumber))} — ${escapeHtml(shortTitle)}
-                            | ${escapeHtml(pageNumber)}
-                            | Score: ${escapeHtml(String(score))}
+                            <div class="summary-grid">
+                                <div class="source-main">
+                                    <div class="source-title-line">
+                                        <span class="source-number">Source ${escapeHtml(String(sourceNumber))}</span>
+                                        <span class="source-name">${escapeHtml(shortTitle)}</span>
+                                    </div>
+                                    <div class="source-subline">
+                                        ${escapeHtml(regulationTitle)} · ${escapeHtml(fileName)} · ${escapeHtml(pageNumber)}
+                                    </div>
+                                </div>
+
+                                <div class="score-pill">
+                                    Retrieval score: ${escapeHtml(String(score))}
+                                </div>
+                            </div>
                         </summary>
+
                         <div class="chunk-body">
-                            <strong>Regulation:</strong> ${escapeHtml(regulationTitle)}
-                            <br>
-                            <strong>File:</strong> ${escapeHtml(fileName)}
-                            <br>
-                            <strong>Chunk ID:</strong> ${escapeHtml(String(source.chunk_id || "N/A"))}
-                            <br>
-                            ${sourceUrl}
+                            <div class="chunk-meta-grid">
+                                <div class="meta-tile">
+                                    <div class="meta-label">Regulation</div>
+                                    <div class="meta-value">${escapeHtml(regulationTitle)}</div>
+                                </div>
 
-                            <br>
-                            <strong>Preview:</strong>
-                            <br><br>
-                            ${preview}
+                                <div class="meta-tile">
+                                    <div class="meta-label">File</div>
+                                    <div class="meta-value">${escapeHtml(fileName)}</div>
+                                </div>
 
-                            <div class="metadata">
-                                <strong>Metadata:</strong>
-                                <pre>${metadataPretty}</pre>
+                                <div class="meta-tile">
+                                    <div class="meta-label">Location</div>
+                                    <div class="meta-value">${escapeHtml(pageNumber)}</div>
+                                </div>
+
+                                <div class="meta-tile">
+                                    <div class="meta-label">URL</div>
+                                    <div class="meta-value">${sourceUrl}</div>
+                                </div>
+                            </div>
+
+                            <strong>Chunk preview</strong>
+                            <div class="preview-box">${escapeHtml(preview)}</div>
+
+                            <div class="raw-metadata">
+                                <pre>${escapeHtml(JSON.stringify(metadata, null, 2))}</pre>
                             </div>
                         </div>
                     </details>
@@ -1273,11 +1828,39 @@
             }).join("");
         }
 
+        function expandAllSources() {
+            document.querySelectorAll("#chunksBox details").forEach((detail) => {
+                detail.open = true;
+            });
+        }
+
+        function collapseAllSources() {
+            document.querySelectorAll("#chunksBox details").forEach((detail) => {
+                detail.open = false;
+            });
+        }
+
+        async function copyAnswer() {
+            const answer = answerBox.textContent.trim();
+
+            if (!answer) {
+                showError("There is no generated answer to copy yet.");
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(answer);
+                showSuccess("Answer copied to clipboard.");
+            } catch (error) {
+                showError("Could not copy the answer automatically.");
+            }
+        }
+
         function setLoading(isLoading) {
             askBtn.disabled = isLoading;
 
             if (isLoading) {
-                askBtn.innerHTML = "<span class='loader'></span>Thinking...";
+                askBtn.innerHTML = "<span class='loader'></span>Retrieving evidence...";
             } else {
                 askBtn.textContent = "Ask assistant";
             }
@@ -1286,6 +1869,24 @@
         function showError(message) {
             errorBox.textContent = message;
             errorBox.style.display = "block";
+            errorBox.style.background = "#fef2f2";
+            errorBox.style.color = "#991b1b";
+            errorBox.style.borderColor = "#fecaca";
+        }
+
+        function showSuccess(message) {
+            errorBox.textContent = message;
+            errorBox.style.display = "block";
+            errorBox.style.background = "#ecfdf5";
+            errorBox.style.color = "#166534";
+            errorBox.style.borderColor = "#bbf7d0";
+
+            setTimeout(() => {
+                errorBox.style.display = "none";
+                errorBox.style.background = "#fef2f2";
+                errorBox.style.color = "#991b1b";
+                errorBox.style.borderColor = "#fecaca";
+            }, 1800);
         }
 
         function escapeHtml(value) {

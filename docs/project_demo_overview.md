@@ -4,7 +4,7 @@
 
 This document defines the recommended final demonstration flow for the AI-Powered Regulatory Compliance Assistant.
 
-The goal of the demo is to show Accenture leadership and technical reviewers that the system works end-to-end, from regulatory data ingestion to grounded AI answer generation and evaluation.
+The goal of the demo is to show Accenture leadership and technical reviewers that the system works end-to-end, from regulatory data ingestion to grounded AI answer generation, source traceability, governance controls, Dockerized application execution, and evaluation.
 
 ---
 
@@ -12,7 +12,7 @@ The goal of the demo is to show Accenture leadership and technical reviewers tha
 
 The main message of the demo is:
 
-> We built an end-to-end AI-powered regulatory compliance assistant that ingests EU regulatory documents, processes them through Databricks, indexes them in Azure AI Search, and allows users to ask natural-language compliance questions with grounded answers and source traceability.
+> We built an end-to-end AI-powered regulatory compliance assistant that ingests EU regulatory documents, processes them through Databricks, generates embeddings in the Gold layer using Azure OpenAI, uploads the embedded chunks to Azure AI Search, and allows users to ask natural-language compliance questions with grounded answers and source traceability.
 
 ---
 
@@ -28,12 +28,14 @@ Recommended structure:
 
 1. Business problem
 2. Architecture overview
-3. Data pipeline
-4. RAG workflow
-5. Live frontend demo
-6. Governance and security
-7. Evaluation results
-8. Limitations and future improvements
+3. Databricks data pipeline
+4. Gold embedding generation
+5. Azure AI Search indexing
+6. Dockerized FastAPI backend
+7. Live frontend demo
+8. Governance and security
+9. Evaluation results
+10. Limitations and future improvements
 
 ---
 
@@ -41,7 +43,7 @@ Recommended structure:
 
 Suggested speaking notes:
 
-> Financial institutions in the EU need to continuously interpret and comply with complex regulations such as GDPR, DORA, PSD2, MiFID II, and the EU AI Act. Searching these documents manually is time-consuming and traditional keyword search does not always provide enough context. Our solution uses Retrieval-Augmented Generation to retrieve relevant regulatory sources and generate grounded answers with traceability.
+> Financial institutions in the EU need to continuously interpret and comply with complex regulations such as GDPR, DORA, PSD2, MiFID II, and the EU AI Act. Searching these documents manually is time-consuming, and traditional keyword search does not always provide enough context. Our solution uses Retrieval-Augmented Generation to retrieve relevant regulatory sources and generate grounded answers with traceability.
 
 ---
 
@@ -58,20 +60,26 @@ Downloader and metadata manifest
     ↓
 Databricks Volume
     ↓
-Bronze/Silver/Gold Delta tables
+Bronze Delta tables
     ↓
-Azure OpenAI embeddings
+Silver chunks
     ↓
-Azure AI Search
+Gold embeddings table
     ↓
-FastAPI RAG backend
+Azure AI Search upload
+    ↓
+Hybrid retrieval
+    ↓
+GPT-4o answer generation
+    ↓
+FastAPI backend
     ↓
 Frontend application
 ```
 
 Suggested speaking notes:
 
-> We use Databricks for the governed data engineering part of the system. Raw documents are processed into Bronze, Silver, and Gold Delta tables. The Gold table is then embedded using Azure OpenAI and uploaded to Azure AI Search. The application layer uses FastAPI and a frontend to query the index and generate answers with GPT-4o.
+> We use Databricks for the governed data engineering part of the system. Raw documents are uploaded to a Unity Catalog Volume and processed into Bronze, Silver, and Gold Delta tables. Bronze stores extracted regulatory text, Silver creates AI-ready chunks, and Gold generates embeddings using Azure OpenAI. The embedded Gold chunks are then uploaded to Azure AI Search. The application layer uses FastAPI and a frontend to query the index and generate grounded answers with GPT-4o.
 
 ---
 
@@ -91,11 +99,13 @@ src/evaluation/evaluate_rag.py
 evaluation/
 docs/
 resources/jobs.yml
+Dockerfile
+docker-compose.yml
 ```
 
 Suggested speaking notes:
 
-> The project is structured by responsibility. Databricks jobs are under `src/jobs`, the RAG logic is in `rag_service.py`, the API and frontend are under `src/frontend`, governance controls are under `src/governance`, and evaluation is under `src/evaluation`.
+> The project is structured by responsibility. Databricks jobs are under `src/jobs`, the RAG logic is in `rag_service.py`, the API and frontend are under `src/frontend`, governance controls are under `src/governance`, evaluation is under `src/evaluation`, and Docker is used to run the local FastAPI application layer.
 
 ---
 
@@ -119,7 +129,7 @@ upload_gold_to_azure_search
 
 Suggested speaking notes:
 
-> The Databricks workflow automates the data engineering and indexing process. Bronze extracts raw document text, Silver creates AI-ready chunks, Gold prepares the final retrieval table, then the final jobs create the Azure AI Search index and upload embedded chunks.
+> The Databricks workflow automates the cloud-side data and indexing process. Bronze extracts raw document text and metadata, Silver creates AI-ready chunks, Gold generates embeddings and stores them in the Gold Delta table, then the final jobs create the Azure AI Search index and upload the existing Gold embeddings.
 
 If available, show the successful Databricks job run and mention:
 
@@ -129,7 +139,27 @@ If available, show the successful Databricks job run and mention:
 
 ---
 
-## 8. Azure AI Search
+## 8. Gold Embedding Generation
+
+Explain the Gold table clearly.
+
+Suggested speaking notes:
+
+> A key design decision is that embeddings are generated in the Gold layer. The `gold_embeddings.py` job reads from the Silver chunk table, sends chunk text to Azure OpenAI, receives embedding vectors, and writes a Gold table called `gold_chunk_embeddings`. This table contains both the original chunk text and the vector representation needed for semantic retrieval.
+
+Mention the Gold table:
+
+```text
+accenture2026dbcks.team4.gold_chunk_embeddings
+```
+
+Then explain:
+
+> The upload job does not create embeddings again. It reads the existing embeddings from Gold and uploads them to Azure AI Search. This avoids duplicate embedding generation and makes index rebuilds faster and cheaper.
+
+---
+
+## 9. Azure AI Search
 
 Show the Azure AI Search index or explain it from the code.
 
@@ -148,17 +178,27 @@ file_name
 
 Suggested speaking notes:
 
-> Azure AI Search stores both the regulatory text and the vector embeddings. The system uses hybrid retrieval, combining keyword search and vector similarity, which improves retrieval when users mention exact regulation names such as GDPR or DORA.
+> Azure AI Search stores the regulatory chunk text, metadata, and embedding vectors. The system uses hybrid retrieval, combining keyword search and vector similarity, which improves retrieval when users mention exact regulation names such as GDPR, DORA, PSD2, MiFID II, or the AI Act.
 
 ---
 
-## 9. Start the Backend
+## 10. Start the Backend
 
-Run:
+Recommended option for final demo:
+
+```powershell
+docker compose up --build
+```
+
+Alternative local development option:
 
 ```powershell
 uv run uvicorn src.frontend.api:app --reload
 ```
+
+Suggested speaking notes:
+
+> The local application layer is Dockerized. The Docker container runs the FastAPI backend and RAG service. Databricks, Azure OpenAI, and Azure AI Search remain external managed cloud services. Runtime configuration is injected through the `.env` file using Docker Compose.
 
 Explain:
 
@@ -166,7 +206,7 @@ Explain:
 
 ---
 
-## 10. Frontend Demo Question 1: GDPR
+## 11. Frontend Demo Question 1: GDPR
 
 Open:
 
@@ -191,11 +231,11 @@ Show:
 
 Suggested speaking notes:
 
-> The answer is grounded in retrieved GDPR chunks. The source cards show exactly where the information came from, including the regulation, page number, file name, and URL.
+> The answer is grounded in retrieved GDPR chunks. The source cards show exactly where the information came from, including the regulation, page number, file name, URL, and retrieval score.
 
 ---
 
-## 11. Frontend Demo Question 2: DORA
+## 12. Frontend Demo Question 2: DORA
 
 Ask:
 
@@ -211,7 +251,7 @@ Suggested speaking notes:
 
 ---
 
-## 12. Frontend Demo Question 3: PII Redaction
+## 13. Frontend Demo Question 3: PII Redaction
 
 Ask:
 
@@ -237,7 +277,7 @@ Suggested speaking notes:
 
 ---
 
-## 13. Authentication Demo
+## 14. Authentication Demo
 
 Optional quick test:
 
@@ -245,13 +285,13 @@ Temporarily explain that the `/ask` endpoint requires an `X-API-Key` header.
 
 Suggested speaking notes:
 
-> The API is protected by a basic API key mechanism. Requests without the correct `X-API-Key` are rejected. For production, this would be replaced by OAuth2, JWT, or Azure AD authentication.
+> The API is protected by a basic API key mechanism. Requests without the correct `X-API-Key` are rejected. For production, this would be replaced by OAuth2, JWT, Azure AD, or another enterprise authentication method.
 
 Do not spend too much time on this section.
 
 ---
 
-## 14. Evaluation Demo
+## 15. Evaluation Demo
 
 Run:
 
@@ -279,7 +319,7 @@ Suggested speaking notes:
 
 ---
 
-## 15. Explain the Evaluation
+## 16. Explain the Evaluation
 
 Suggested explanation:
 
@@ -296,15 +336,15 @@ Final result:
 
 ---
 
-## 16. Leadership-Level Value
+## 17. Leadership-Level Value
 
 Suggested speaking notes:
 
-> The business value is that compliance teams can ask natural-language questions and quickly receive grounded answers with traceable evidence. This reduces manual search effort, improves knowledge accessibility, and provides a foundation for governed AI adoption in regulated financial environments.
+> The business value is that compliance teams can ask natural-language questions and quickly receive grounded answers with traceable evidence. This reduces manual search effort, improves regulatory knowledge accessibility, and provides a foundation for governed AI adoption in regulated financial environments.
 
 ---
 
-## 17. Limitations
+## 18. Limitations
 
 Mention honestly:
 
@@ -313,6 +353,7 @@ Mention honestly:
 * Evaluation dataset is lightweight.
 * Production deployment would require stronger identity management and monitoring.
 * Regulation-specific filters and semantic reranking could improve retrieval further.
+* The current application is a prototype, not a production legal advisory system.
 
 Suggested speaking notes:
 
@@ -320,8 +361,8 @@ Suggested speaking notes:
 
 ---
 
-## 18. Closing
+## 19. Closing
 
 Suggested closing:
 
-> In conclusion, the project delivers a complete working RAG system for EU regulatory compliance. It demonstrates data ingestion, Databricks engineering, Azure AI Search indexing, GPT-4o answer generation, API/frontend integration, governance controls, and automated evaluation. The system is ready for demonstration and provides a strong foundation for a production compliance knowledge assistant.
+> In conclusion, the project delivers a complete working RAG system for EU regulatory compliance. It demonstrates regulatory ingestion, Databricks engineering, Gold embedding generation, Azure AI Search indexing, GPT-4o answer generation, API/frontend integration, Dockerized local execution, governance controls, and automated evaluation. The system is ready for demonstration and provides a strong foundation for a production compliance knowledge assistant.

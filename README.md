@@ -6,7 +6,7 @@ The AI-Powered Regulatory Compliance Assistant is an end-to-end Retrieval-Augmen
 
 The system enables users to ask natural-language questions about European Union regulations and receive grounded answers based on retrieved regulatory sources. Each answer includes source traceability such as regulation name, file name, page number, retrieval score, and source URL.
 
-The project combines Databricks, Delta Lake, Azure OpenAI, Azure AI Search, FastAPI, and a web frontend to create a governed AI knowledge engineering pipeline for regulatory compliance use cases.
+The project combines Databricks, Delta Lake, Azure OpenAI, Azure AI Search, FastAPI, Docker, and a web frontend to create a governed AI knowledge engineering pipeline for regulatory compliance use cases.
 
 ---
 
@@ -38,13 +38,14 @@ The system supports:
 * Bronze/Silver/Gold Delta table processing,
 * PDF, HTML, and XML text extraction,
 * AI-ready chunking with metadata and lineage,
-* Azure OpenAI embedding generation,
+* Gold embedding generation using Azure OpenAI,
 * Azure AI Search vector and hybrid retrieval,
 * GPT-4o answer generation,
 * FastAPI `/ask` endpoint,
 * API key authentication,
 * PII redaction,
 * web frontend interface,
+* Dockerized local application layer,
 * source traceability,
 * automated RAG evaluation,
 * and LLM-as-judge groundedness evaluation.
@@ -66,11 +67,9 @@ Bronze Delta Tables
     ↓
 Silver Chunking
     ↓
-Gold Retrieval Table
+Gold Embedding Generation
     ↓
-Azure OpenAI Embeddings
-    ↓
-Azure AI Search Index
+Azure AI Search Upload
     ↓
 Hybrid Retrieval
     ↓
@@ -88,13 +87,14 @@ Frontend Application
 | Layer                         | Implementation                                            |
 | ----------------------------- | --------------------------------------------------------- |
 | Data Sources Layer            | EUR-Lex PDFs, EBA HTML, ECB XML                           |
-| Ingestion Layer               | `src/downloader.py`, `src/uploader.py`                    |
-| Data Engineering Layer        | Databricks jobs, Bronze/Silver/Gold Delta tables          |
+| Ingestion Layer               | `src/downloader.py`, `src/upload_to_volume.py`            |
+| Data Engineering Layer        | Databricks jobs, PySpark, Bronze/Silver/Gold Delta tables |
 | AI Processing Layer           | Azure OpenAI embeddings and GPT-4o                        |
 | Retrieval Layer               | Azure AI Search vector and hybrid retrieval               |
 | RAG Layer                     | `src/rag_service.py`                                      |
 | API & Application Layer       | FastAPI backend and HTML/CSS/JavaScript frontend          |
-| Governance & Security Layer   | Databricks secrets, API key authentication, PII redaction |
+| Governance & Security Layer   | Databricks Secrets, API key authentication, PII redaction |
+| DevOps Layer                  | Dockerfile, Docker Compose, Databricks Bundles            |
 | Evaluation & Monitoring Layer | Automated evaluation script and evaluation report         |
 
 ---
@@ -110,7 +110,10 @@ ProjectAccenture/
 │   └── raw/
 │
 ├── docs/
-│   └── evaluation_report.md
+│   ├── architecture.md
+│   ├── evaluation_report.md
+│   ├── version_control_strategy.md
+│   └── docker_usage.md
 │
 ├── evaluation/
 │   ├── evaluation_questions.json
@@ -121,6 +124,7 @@ ProjectAccenture/
 │
 ├── src/
 │   ├── evaluation/
+│   │   ├── __init__.py
 │   │   └── evaluate_rag.py
 │   │
 │   ├── frontend/
@@ -128,6 +132,7 @@ ProjectAccenture/
 │   │   └── index.html
 │   │
 │   ├── governance/
+│   │   ├── __init__.py
 │   │   └── pii_redaction.py
 │   │
 │   ├── jobs/
@@ -137,15 +142,17 @@ ProjectAccenture/
 │   │   ├── create_azure_search_index.py
 │   │   └── upload_gold_to_azure_search.py
 │   │
+│   ├── __init__.py
 │   ├── config.py
 │   ├── downloader.py
 │   ├── rag_service.py
-│   └── uploader.py
+│   └── upload_to_volume.py
+│
+├── .dockerignore
 ├── Dockerfile
 ├── docker-compose.yml
-├── .dockerignore
 ├── databricks.yml
-├── pyproject.toml   
+├── pyproject.toml
 ├── uv.lock
 └── README.md
 ```
@@ -166,13 +173,13 @@ The downloader prepares the regulatory dataset by collecting or registering regu
 
 The downloader prepares:
 
-* GDPR PDF
-* DORA PDF
-* PSD2 PDF
-* MiFID II PDF
-* EU AI Act PDF
-* EBA HTML source
-* ECB XML source
+* GDPR PDF,
+* DORA PDF,
+* PSD2 PDF,
+* MiFID II PDF,
+* EU AI Act PDF,
+* EBA HTML source,
+* ECB XML source.
 
 It creates the manifest at:
 
@@ -182,15 +189,15 @@ data/metadata/document_manifest.json
 
 ---
 
-### 7.2 Databricks Volume Uploader
+### 7.2 Databricks Volume Upload
 
 File:
 
 ```text
-src/uploader.py
+src/upload_to_volume.py
 ```
 
-The uploader transfers local raw documents and metadata into a Databricks Unity Catalog Volume.
+The upload script transfers local raw documents and metadata into a Databricks Unity Catalog Volume.
 
 The Databricks Volume acts as the governed storage layer for raw regulatory documents before they are processed into Delta tables.
 
@@ -257,7 +264,7 @@ Each chunk includes:
 
 ---
 
-### 7.5 Gold Retrieval Table
+### 7.5 Gold Embedding Generation
 
 File:
 
@@ -265,17 +272,33 @@ File:
 src/jobs/gold_embeddings.py
 ```
 
-The Gold job prepares the final clean retrieval table used before embedding and indexing.
+The Gold job reads the Silver chunk table, generates embeddings using Azure OpenAI, and writes the final Gold embeddings table.
 
-The output table is:
+Input table:
 
 ```text
-accenture2026dbcks.team4.gold_document_embeddings
+accenture2026dbcks.team4.silver_document_chunks
 ```
 
-Despite the file name, this job does not create embeddings directly. It prepares the clean AI-ready Gold dataset with chunk text and metadata.
+Output table:
 
-Embedding generation happens later in the Azure AI Search upload job.
+```text
+accenture2026dbcks.team4.gold_chunk_embeddings
+```
+
+Each Gold row contains:
+
+* chunk ID,
+* chunk text,
+* regulation metadata,
+* source URL,
+* page number,
+* file name,
+* and the generated embedding vector.
+
+This means the Gold layer is the AI-ready retrieval layer. It contains both the text content and the vector representation required for semantic search.
+
+Embeddings are generated using the Azure OpenAI embedding deployment configured through Databricks Secrets.
 
 ---
 
@@ -306,7 +329,7 @@ The index supports vector retrieval and hybrid search.
 
 ---
 
-### 7.7 Embedding Generation and Azure AI Search Upload
+### 7.7 Azure AI Search Upload
 
 File:
 
@@ -314,16 +337,28 @@ File:
 src/jobs/upload_gold_to_azure_search.py
 ```
 
-This job reads rows from the Gold Delta table, generates embeddings using Azure OpenAI, and uploads the final documents to Azure AI Search.
+This job reads the Gold embeddings table and uploads the existing chunk text, metadata, and embeddings to Azure AI Search.
 
-The job performs:
+Input table:
 
-1. Read Gold chunks from Databricks.
-2. Generate embeddings in batches.
-3. Attach metadata to each chunk.
-4. Upload documents to Azure AI Search.
+```text
+accenture2026dbcks.team4.gold_chunk_embeddings
+```
 
-The final Azure AI Search index stores both the chunk text and its vector embedding.
+The upload job does not generate embeddings. Embeddings are already produced by the Gold job and stored in the `embedding` column.
+
+The upload job sends the following fields to Azure AI Search:
+
+* `chunk_id`
+* `chunk_text`
+* `embedding`
+* `short_title`
+* `regulation_title`
+* `source_url`
+* `page_number`
+* `file_name`
+
+This separation avoids re-embedding chunks every time the Azure AI Search index is rebuilt.
 
 ---
 
@@ -530,11 +565,32 @@ TOP_K=5
 
 The `.env` file should not be committed to Git.
 
-In Databricks jobs, secrets are loaded from Databricks Secrets using the configured secret scope.
+---
+
+## 9. Databricks Secrets
+
+Databricks jobs read cloud credentials from the secret scope:
+
+```text
+compliance-assistant
+```
+
+Required keys:
+
+```text
+AI_SEARCH_ENDPOINT
+AI_SEARCH_API_KEY
+AZURE_OPENAI_ENDPOINT
+AZURE_OPENAI_API_KEY
+AZURE_OPENAI_API_VERSION
+EMBEDDING_MODEL_NAME
+```
+
+The Gold embeddings job uses the Azure OpenAI secrets to generate embeddings. The Azure AI Search upload job uses the AI Search secrets to upload embedded chunks to the search index.
 
 ---
 
-## 9. Databricks Workflow
+## 10. Databricks Workflow
 
 The Databricks job pipeline is defined in:
 
@@ -556,27 +612,27 @@ create_azure_search_index
 upload_gold_to_azure_search
 ```
 
-The workflow performs the full data engineering and indexing process from raw documents to searchable Azure AI Search chunks.
+Task responsibilities:
+
+* `bronze_ingestion` extracts text and metadata from raw files.
+* `silver_chunking` creates AI-ready chunks.
+* `gold_embeddings` generates embeddings and writes the Gold Delta table.
+* `create_azure_search_index` creates or updates the Azure AI Search index.
+* `upload_gold_to_azure_search` reads existing Gold embeddings and uploads them to Azure AI Search.
 
 ---
 
-## 10. How to Run Locally
+## 11. How to Run Locally
 
-### 10.1 Install dependencies
+### 11.1 Install dependencies
 
 ```powershell
 uv sync
 ```
 
-or:
-
-```powershell
-uv install
-```
-
 ---
 
-### 10.2 Run the downloader
+### 11.2 Run the downloader
 
 ```powershell
 uv run python src/downloader.py
@@ -584,15 +640,15 @@ uv run python src/downloader.py
 
 ---
 
-### 10.3 Upload files to Databricks Volume
+### 11.3 Upload files to Databricks Volume
 
 ```powershell
-uv run python src/uploader.py
+uv run python src/upload_to_volume.py
 ```
 
 ---
 
-### 10.4 Deploy and run Databricks Bundle
+### 11.4 Deploy and run Databricks Bundle
 
 Validate the bundle:
 
@@ -614,7 +670,7 @@ databricks bundle run regulatory_compliance_pipeline -p train13
 
 ---
 
-### 10.5 Run the FastAPI backend
+### 11.5 Run the FastAPI backend locally
 
 ```powershell
 uv run uvicorn src.frontend.api:app --reload
@@ -634,7 +690,7 @@ http://127.0.0.1:8000/docs
 
 ---
 
-### 10.6 Open the frontend
+### 11.6 Open the frontend
 
 Open:
 
@@ -651,7 +707,8 @@ http://127.0.0.1:8000/ask
 ```
 
 ---
-## Running with Docker
+
+## 12. Running with Docker
 
 The local application layer can also be run with Docker.
 
@@ -668,13 +725,13 @@ The Docker container runs the local API layer and connects to Azure OpenAI and A
 
 The Docker container includes:
 
-* FastAPI backend
-* `/ask` endpoint
-* RAG service
-* Azure AI Search retrieval client
-* Azure OpenAI client
-* PII redaction logic
-* API key authentication
+* FastAPI backend,
+* `/ask` endpoint,
+* RAG service,
+* Azure AI Search retrieval client,
+* Azure OpenAI client,
+* PII redaction logic,
+* API key authentication.
 
 ### Files
 
@@ -743,7 +800,9 @@ The `.env` file is loaded at runtime through Docker Compose. It is not copied in
 
 This setup Dockerizes the local application layer only. Databricks and Azure services are intentionally kept as external cloud services.
 
-## 11. Example API Request
+---
+
+## 13. Example API Request
 
 ```powershell
 curl -X POST "http://127.0.0.1:8000/ask" `
@@ -754,7 +813,7 @@ curl -X POST "http://127.0.0.1:8000/ask" `
 
 ---
 
-## 12. Example Questions
+## 14. Example Demo Questions
 
 Useful demo questions:
 
@@ -784,7 +843,7 @@ My email is maria.test@example.com. What does GDPR say about the protection of p
 
 ---
 
-## 13. Evaluation
+## 15. Evaluation
 
 Run the evaluation pipeline:
 
@@ -812,7 +871,7 @@ docs/evaluation_report.md
 
 ---
 
-## 14. Security and Governance
+## 16. Security and Governance
 
 The project includes several security and governance controls:
 
@@ -829,7 +888,7 @@ For production, API key authentication should be replaced with enterprise authen
 
 ---
 
-## 15. Current Limitations
+## 17. Current Limitations
 
 Current limitations include:
 
@@ -843,11 +902,11 @@ Current limitations include:
 
 ---
 
-## 16. Future Improvements
+## 18. Future Improvements
 
 Future improvements include:
 
-* moving the downloader fully into a Databricks job-Eurlex issue,
+* moving the downloader fully into a Databricks job,
 * adding regulation-specific filters when a question explicitly mentions a regulation,
 * adding semantic reranking,
 * expanding evaluation questions,
@@ -855,30 +914,14 @@ Future improvements include:
 * adding more advanced PII detection,
 * integrating Azure Key Vault,
 * adding OAuth2/JWT authentication,
+* adding automated CI/CD,
 * adding production observability dashboards,
 * and deploying the frontend/backend to a cloud application platform.
 
 ---
-
-## 17. Final Demonstration Flow
-
-The recommended final demo flow is:
-
-1. Show the business problem.
-2. Show the architecture diagram.
-3. Show the project structure.
-4. Run or show the Databricks pipeline.
-5. Show the Azure AI Search index.
-6. Start the FastAPI backend.
-7. Ask a GDPR question in the frontend.
-8. Show the generated answer and retrieved sources.
-9. Ask a question with PII and explain redaction.
-10. Show the evaluation results.
-11. Explain limitations and future improvements.
-
 ---
 
-## 18. Final Result
+## 19. Final Result
 
 The project delivers a working AI-powered regulatory compliance assistant with an end-to-end data and AI pipeline.
 
@@ -886,14 +929,15 @@ It demonstrates:
 
 * governed regulatory data ingestion,
 * Databricks-based data engineering,
-* AI-ready document chunking,
-* Azure OpenAI embeddings,
+* Bronze/Silver/Gold Delta architecture,
+* Gold embedding generation using Azure OpenAI,
 * Azure AI Search hybrid retrieval,
 * GPT-4o answer generation,
 * API and frontend integration,
 * source traceability,
 * PII redaction,
-* authentication,
+* API key authentication,
+* Dockerized local application layer,
 * and automated RAG evaluation.
 
 The final system is ready for demonstration to business and technical stakeholders.
