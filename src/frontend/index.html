@@ -11,20 +11,17 @@
         }
 
         :root {
-            --bg-dark: #050816;
-            --bg-dark-2: #0f172a;
-            --panel: #ffffff;
-            --panel-soft: #f8fafc;
+            --bg-dark: #020617;
+            --bg-card: rgba(15, 23, 42, 0.78);
+            --white: #ffffff;
             --text: #0f172a;
             --muted: #64748b;
             --border: #e2e8f0;
             --blue: #2563eb;
             --blue-dark: #1d4ed8;
             --violet: #7c3aed;
-            --cyan: #06b6d4;
             --green: #16a34a;
             --red: #dc2626;
-            --amber: #d97706;
             --shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
             --shadow-dark: 0 30px 90px rgba(2, 6, 23, 0.42);
             --radius-xl: 32px;
@@ -41,13 +38,23 @@
             min-height: 100vh;
             font-family: "Segoe UI", Inter, Arial, sans-serif;
             color: var(--text);
-            background: #020617;
+            background: var(--bg-dark);
         }
 
         button,
         textarea,
         select {
             font-family: inherit;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            border-radius: 17px;
+            padding: 14px 18px;
+            font-size: 14px;
+            font-weight: 900;
+            transition: 0.16s ease;
         }
 
         .page {
@@ -102,9 +109,8 @@
             display: grid;
             place-items: center;
             font-weight: 950;
-            letter-spacing: -1px;
             background:
-                linear-gradient(135deg, rgba(255, 255, 255, 0.20), rgba(255, 255, 255, 0.04)),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04)),
                 linear-gradient(135deg, var(--blue), var(--violet));
             box-shadow: 0 18px 42px rgba(37, 99, 235, 0.42);
         }
@@ -142,8 +148,6 @@
             border: 1px solid rgba(255, 255, 255, 0.16);
             color: rgba(255, 255, 255, 0.84);
             background: rgba(255, 255, 255, 0.08);
-            cursor: pointer;
-            transition: 0.18s ease;
         }
 
         .nav-btn:hover,
@@ -165,7 +169,7 @@
             color: white;
             overflow: hidden;
             background:
-                linear-gradient(90deg, rgba(2, 6, 23, 0.92), rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.62)),
+                linear-gradient(90deg, rgba(2, 6, 23, 0.94), rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.58)),
                 url("https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=2200&q=85");
             background-size: cover;
             background-position: center;
@@ -196,13 +200,14 @@
             pointer-events: none;
         }
 
-        .hero-grid {
+        .hero-content {
             position: relative;
             z-index: 1;
-            display: grid;
-            grid-template-columns: 0.95fr 1.05fr;
-            gap: 34px;
-            align-items: center;
+        }
+
+        .hero-top {
+            max-width: 1160px;
+            margin-bottom: 34px;
         }
 
         .eyebrow {
@@ -230,22 +235,29 @@
 
         h1 {
             margin: 0;
-            max-width: 760px;
-            font-size: clamp(46px, 6.8vw, 84px);
+            max-width: 1160px;
+            font-size: clamp(44px, 5.6vw, 78px);
             line-height: 0.96;
             letter-spacing: -3px;
         }
 
+        .hero-main {
+            display: grid;
+            grid-template-columns: 0.92fr 1.08fr;
+            gap: 34px;
+            align-items: stretch;
+        }
+
         .lead {
             max-width: 690px;
-            margin: 24px 0 0;
-            color: rgba(255, 255, 255, 0.74);
+            margin: 0;
+            color: rgba(255, 255, 255, 0.76);
             font-size: 19px;
             line-height: 1.75;
         }
 
         .executive-strip {
-            margin-top: 26px;
+            margin-top: 24px;
             padding: 16px;
             border-radius: 28px;
             background:
@@ -270,7 +282,7 @@
         }
 
         .executive-strip-title span:last-child {
-            color: rgba(255, 255, 255, 0.56);
+            color: rgba(255, 255, 255, 0.58);
             font-size: 12px;
             font-weight: 750;
             text-transform: none;
@@ -279,7 +291,7 @@
 
         .executive-metrics {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 12px;
         }
 
@@ -320,7 +332,7 @@
             position: relative;
             z-index: 1;
             color: white;
-            font-size: 30px;
+            font-size: 29px;
             font-weight: 950;
             letter-spacing: -0.9px;
         }
@@ -329,7 +341,7 @@
             position: relative;
             z-index: 1;
             margin-top: 5px;
-            color: rgba(255, 255, 255, 0.62);
+            color: rgba(255, 255, 255, 0.66);
             font-size: 12px;
             line-height: 1.4;
         }
@@ -421,16 +433,6 @@
             grid-template-columns: 1fr auto auto;
             gap: 10px;
             margin-top: 14px;
-        }
-
-        button {
-            border: none;
-            cursor: pointer;
-            border-radius: 17px;
-            padding: 14px 18px;
-            font-size: 14px;
-            font-weight: 950;
-            transition: 0.16s ease;
         }
 
         .primary-btn {
@@ -853,11 +855,12 @@
         }
 
         .about-hero h1 {
-            max-width: 940px;
+            max-width: 980px;
         }
 
         .about-hero .lead {
             max-width: 860px;
+            margin-top: 24px;
         }
 
         .about-content {
@@ -1031,8 +1034,13 @@
         }
 
         @media (max-width: 1050px) {
-            .hero-grid {
+            .hero-main,
+            .about-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .executive-metrics {
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .chunk-meta-grid,
@@ -1072,8 +1080,7 @@
             }
 
             .executive-metrics,
-            .workflow-preview,
-            .about-grid {
+            .workflow-preview {
                 grid-template-columns: 1fr;
             }
 
@@ -1115,7 +1122,7 @@
                 <div class="brand-mark">AI</div>
                 <div>
                     <div class="brand-title">EU Regulatory Compliance Assistant</div>
-                    <div class="brand-subtitle">Databricks · Gold Embeddings · Azure AI Search · GPT-4o RAG</div>
+                    <div class="brand-subtitle">Databricks · Delta Lake · Azure AI Search · GPT-4o RAG</div>
                 </div>
             </div>
 
@@ -1129,16 +1136,18 @@
 
     <main class="page active" id="chatPage">
         <section class="hero">
-            <div class="shell">
-                <div class="hero-grid">
+            <div class="shell hero-content">
+                <div class="hero-top">
+                    <div class="eyebrow">
+                        <span class="pulse-dot"></span>
+                        Live regulatory RAG assistant
+                    </div>
+
+                    <h1>Grounded answers for EU compliance teams.</h1>
+                </div>
+
+                <div class="hero-main">
                     <div>
-                        <div class="eyebrow">
-                            <span class="pulse-dot"></span>
-                            Live regulatory RAG assistant
-                        </div>
-
-                        <h1>Grounded answers for EU compliance teams.</h1>
-
                         <p class="lead">
                             Ask natural-language questions across GDPR, DORA, PSD2, MiFID II, and the EU AI Act.
                             The assistant retrieves regulatory evidence from Azure AI Search and generates
@@ -1148,7 +1157,7 @@
                         <div class="executive-strip">
                             <div class="executive-strip-title">
                                 <span>System readiness</span>
-                                <span>Final evaluation and indexing status</span>
+                                <span>Latest Databricks evaluation and indexing status</span>
                             </div>
 
                             <div class="executive-metrics">
@@ -1166,8 +1175,14 @@
 
                                 <div class="executive-metric-card">
                                     <div class="executive-metric-icon">★</div>
-                                    <div class="executive-metric-value">4.917/5</div>
-                                    <div class="executive-metric-label">Average faithfulness and groundedness score</div>
+                                    <div class="executive-metric-value">5.0/5</div>
+                                    <div class="executive-metric-label">Average faithfulness score from evaluation</div>
+                                </div>
+
+                                <div class="executive-metric-card">
+                                    <div class="executive-metric-icon">◎</div>
+                                    <div class="executive-metric-value">95.8%</div>
+                                    <div class="executive-metric-label">Average keyword coverage across the test set</div>
                                 </div>
                             </div>
                         </div>
@@ -1313,9 +1328,9 @@
 
                 <p class="lead">
                     This project implements an end-to-end AI-powered regulatory compliance assistant
-                    for EU financial institutions. It combines governed data engineering, Gold embedding
-                    generation, vector search, hybrid retrieval, source-grounded generation, PII handling,
-                    Dockerized application execution, and automated RAG evaluation.
+                    for EU financial institutions. It combines Databricks-based regulatory downloading,
+                    governed document processing, Gold embedding generation, hybrid retrieval, source-grounded
+                    answer generation, PII handling, Dockerized application execution, and automated RAG evaluation.
                 </p>
             </div>
         </section>
@@ -1344,31 +1359,39 @@
                     <div class="about-card wide">
                         <h2>Implemented architecture</h2>
                         <p>
-                            The solution uses Databricks for governed document processing, Delta Lake for
-                            Bronze/Silver/Gold tables, Azure OpenAI for Gold embedding generation and GPT-4o
-                            answer generation, Azure AI Search for hybrid retrieval, Docker for local application
-                            execution, and FastAPI for the API layer.
+                            The solution uses Databricks for governed document downloading and processing,
+                            Delta Lake for Bronze, Silver, and Gold tables, Azure OpenAI for embedding and answer
+                            generation, Azure AI Search for hybrid retrieval, Docker for local application execution,
+                            and FastAPI for the API layer.
                         </p>
 
                         <div class="pipeline">
                             <div class="pipeline-step">
                                 <div class="step-number">1</div>
                                 <div>
-                                    <strong>Databricks Bronze ingestion</strong>
-                                    <span>The Bronze ingestion job downloads regulatory documents directly from EUR-Lex via CELEX IDs, extracts text from PDFs, HTML, and XML files, and stores document-level and page-level records in Bronze Delta tables.</span>
+                                    <strong>Databricks regulatory downloader</strong>
+                                    <span>The downloader now runs through Databricks, retrieves EU regulatory documents using CELEX-based workflows, and prepares the raw regulatory dataset for downstream processing.</span>
                                 </div>
                             </div>
 
                             <div class="pipeline-step">
                                 <div class="step-number">2</div>
                                 <div>
-                                    <strong>Silver chunking</strong>
-                                    <span>Extracted text is split into overlapping AI-ready chunks while preserving metadata and source provenance.</span>
+                                    <strong>Bronze ingestion</strong>
+                                    <span>Raw regulatory content is stored in Databricks and converted into document-level and page-level Bronze records with metadata and source provenance.</span>
                                 </div>
                             </div>
 
                             <div class="pipeline-step">
                                 <div class="step-number">3</div>
+                                <div>
+                                    <strong>Silver chunking</strong>
+                                    <span>Extracted text is split into overlapping AI-ready chunks while preserving regulation title, source URL, file name, page number, and lineage fields.</span>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-step">
+                                <div class="step-number">4</div>
                                 <div>
                                     <strong>Gold embedding generation</strong>
                                     <span>The Gold job generates embeddings using Azure OpenAI and writes chunk text, metadata, and vectors to the Gold Delta table.</span>
@@ -1376,18 +1399,18 @@
                             </div>
 
                             <div class="pipeline-step">
-                                <div class="step-number">4</div>
+                                <div class="step-number">5</div>
                                 <div>
                                     <strong>Azure AI Search upload</strong>
-                                    <span>The upload job reads existing Gold embeddings and uploads chunk text, metadata, and vectors to Azure AI Search.</span>
+                                    <span>The upload job reads existing Gold embeddings and uploads chunk text, metadata, and vectors to Azure AI Search for hybrid retrieval.</span>
                                 </div>
                             </div>
 
                             <div class="pipeline-step">
-                                <div class="step-number">5</div>
+                                <div class="step-number">6</div>
                                 <div>
                                     <strong>RAG API and frontend</strong>
-                                    <span>FastAPI exposes the /ask endpoint and this frontend displays grounded answers with retrieved evidence.</span>
+                                    <span>FastAPI exposes the /ask endpoint and this frontend displays grounded answers with retrieved source evidence.</span>
                                 </div>
                             </div>
                         </div>
@@ -1397,6 +1420,11 @@
                         <h2>Implemented capabilities</h2>
 
                         <div class="capability-grid">
+                            <div class="mini-card">
+                                <strong>Databricks downloader</strong>
+                                <span>Regulatory documents are downloaded and prepared through Databricks-based jobs.</span>
+                            </div>
+
                             <div class="mini-card">
                                 <strong>Governed ingestion</strong>
                                 <span>Raw regulatory documents are stored and processed through Databricks and Delta tables.</span>
@@ -1436,11 +1464,6 @@
                                 <strong>Automated evaluation</strong>
                                 <span>The RAG pipeline is evaluated using retrieval checks and LLM-as-judge groundedness scoring.</span>
                             </div>
-
-                            <div class="mini-card">
-                                <strong>Source traceability</strong>
-                                <span>Returned answers include regulation title, file name, source URL, page number, and retrieval score.</span>
-                            </div>
                         </div>
                     </div>
 
@@ -1475,12 +1498,13 @@
                     </div>
 
                     <div class="about-card wide">
-                        <h2>Evaluation results</h2>
+                        <h2>Latest evaluation results</h2>
                         <p>
-                            The final evaluation dataset contains 12 representative questions covering GDPR,
-                            DORA, PSD2, MiFID II, and the EU AI Act. It includes direct regulation-specific
-                            questions, broader compliance questions, a PII-containing question, and
-                            regulation-identification questions.
+                            The latest evaluation dataset contains 12 representative questions covering GDPR,
+                            DORA, PSD2, MiFID II, and the EU AI Act. The new Databricks-based implementation
+                            passed all evaluation questions, retrieved the expected regulation for every question,
+                            matched the expected regulation in the top source every time, and achieved a perfect
+                            average faithfulness score.
                         </p>
 
                         <table class="eval-table">
@@ -1508,6 +1532,11 @@
                                 </tr>
 
                                 <tr>
+                                    <td>Questions with sources</td>
+                                    <td>12 / 12</td>
+                                </tr>
+
+                                <tr>
                                     <td>Expected regulation found</td>
                                     <td>12 / 12</td>
                                 </tr>
@@ -1524,7 +1553,7 @@
 
                                 <tr>
                                     <td>Average faithfulness score</td>
-                                    <td>4.917 / 5</td>
+                                    <td>5.0 / 5</td>
                                 </tr>
 
                                 <tr>
