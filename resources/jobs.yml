@@ -3,6 +3,10 @@ resources:
     regulatory_compliance_pipeline:
       name: regulatory_compliance_pipeline
 
+      schedule:
+        quartz_cron_expression: "0 0 8 ? * MON *"
+        timezone_id: "Europe/Athens"
+
       tasks:
         - task_key: downloader_job
           spark_python_task:
