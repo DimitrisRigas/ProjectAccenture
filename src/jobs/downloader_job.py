@@ -10,8 +10,11 @@ Downloads all documents automatically:
 
 Change detection:
 - EUR-Lex: compares CELLAR lastModificationDate against previous manifest.
-  Skips download if unchanged.
-- EBA/ECB: always re-downloaded (small text files, no reliable change signal).
+- EBA/ECB: sends If-Modified-Since header; skips on 304 Not Modified.
+  Falls back to always downloading if server does not support it.
+
+If no document changed, sets changes_detected=false via task values so
+downstream tasks (Bronze → Gold) can be skipped via a condition task.
 
 Write strategy (Unity Catalog Volume POSIX limitations in serverless):
 - PDFs (binary):    SDK files.upload() to Volume
@@ -99,24 +102,24 @@ RATE_LIMIT_DELAY = 1.5
 
 
 # =============================================================================
-# Corpus normalisation — expand minimal registry entries into full records
+# Corpus normalisation
 # =============================================================================
 
 def _expand_eurlex(entry: dict[str, Any]) -> dict[str, Any]:
-    """Derive full document record from a minimal EUR-Lex corpus entry."""
     celex = entry["celex"]
+    short_title = entry['short_title']
     return {
         "document_id": celex,
         "celex": celex,
         "short_title": entry["short_title"],
-        "title": None,  # fetched from CELLAR RDF at download time
+        "title": None,
         "category": entry["category"],
         "source_system": "EUR-Lex",
         "source_url": (
             f"https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:{celex}"
         ),
         "file_format": "pdf",
-        "file_name": f"{celex}_EN.pdf",
+        "file_name": f"{celex}_EN_{short_title}.pdf",
     }
 
 
@@ -149,14 +152,14 @@ def output_dir_for(file_format: str) -> Path:
 
 
 # =============================================================================
-# Manifest — load previous run for change detection
+# Manifest
 # =============================================================================
 
 def load_previous_manifest() -> dict[str, dict[str, Any]]:
     """
     Load the manifest from the previous run, keyed by document_id.
     Uses Spark to avoid POSIX read limitations on this volume.
-    Returns an empty dict if no manifest exists yet.
+    Returns empty dict if no manifest exists yet.
     """
     try:
         from pyspark.sql import SparkSession
@@ -174,6 +177,12 @@ def load_previous_manifest() -> dict[str, dict[str, Any]]:
         return {}
 
 
+def save_manifest(records: list[dict[str, Any]]) -> None:
+    content = json.dumps(records, indent=4, ensure_ascii=False)
+    dbutils.fs.put(str(MANIFEST_PATH), content, overwrite=True)  # noqa: F821
+    print(f"Manifest saved to: {MANIFEST_PATH}")
+
+
 # =============================================================================
 # Metadata builders
 # =============================================================================
@@ -183,6 +192,7 @@ def create_metadata(
     file_path: Path,
     cellar_last_modified: str | None = None,
     title: str | None = None,
+    last_modified_header: str | None = None,
 ) -> dict[str, Any]:
     return {
         "document_id": document["document_id"],
@@ -199,6 +209,7 @@ def create_metadata(
         "file_size_bytes": None,
         "sha256": None,
         "cellar_last_modified": cellar_last_modified,
+        "last_modified_header": last_modified_header,
         "downloaded_at_utc": now_utc(),
         "ingestion_status": "downloaded",
         "acquisition_method": "automatic_download",
@@ -226,10 +237,6 @@ def create_failed_metadata(document: dict[str, Any], error: Exception) -> dict[s
 # =============================================================================
 
 def _extract_english_cellar_id(rdf_text: str) -> str:
-    """
-    Extract the CELLAR UUID.ExpressionNumber for the English expression.
-    Finds the rdf:Description block containing lang=en/eng.
-    """
     blocks = rdf_text.split("<rdf:Description")
     for block in blocks:
         if ">en<" not in block and ">eng<" not in block:
@@ -245,32 +252,28 @@ def _extract_english_cellar_id(rdf_text: str) -> str:
 
 
 def _extract_modification_date(rdf_text: str) -> str | None:
-    """Extract lastModificationDate from CELLAR RDF."""
     match = re.search(r'lastModificationDate[^>]*>([^<]+)</j', rdf_text)
     return match.group(1).strip() if match else None
 
 
 def _extract_title(rdf_text: str) -> str | None:
-    """Extract document title from CELLAR RDF."""
     match = re.search(r'<j\.0:title>([^<]+)</j\.0:title>', rdf_text)
     return match.group(1).strip() if match else None
 
 
 # =============================================================================
-# EUR-Lex PDF download (CELLAR two-step)
+# EUR-Lex PDF acquisition
 # =============================================================================
 
 def acquire_eurlex_document(
     document: dict[str, Any],
     previous: dict[str, Any] | None,
-) -> dict[str, Any]:
+) -> tuple[dict[str, Any], bool]:
     """
     Download a EUR-Lex PDF via CELLAR, skipping if unchanged.
 
-    Step 1: Fetch RDF → extract CELLAR ID, modification date, title.
-    Step 2: Compare modification date with previous manifest.
-            If unchanged, return previous metadata without re-downloading.
-    Step 3: Download PDF/A and upload to Volume via SDK.
+    Returns (metadata, changed) where changed=False means the document
+    was unchanged and the download was skipped.
     """
     celex_id = document["celex"]
     file_path = output_dir_for("pdf") / document["file_name"]
@@ -299,12 +302,10 @@ def acquire_eurlex_document(
         and previous.get("cellar_last_modified") == mod_date
         and mod_date is not None
     ):
-        print(
-            f"[{celex_id}] Unchanged (last modified: {mod_date}). Skipping download."
-        )
-        return {**previous, "downloaded_at_utc": now_utc()}
+        print(f"[{celex_id}] Unchanged (last modified: {mod_date}). Skipping.")
+        return {**previous, "downloaded_at_utc": now_utc()}, False
 
-    # Step 3: download PDF/A
+    # Step 3: download and upload
     print(f"[{celex_id}] CELLAR expression: {cellar_id}")
     time.sleep(1)
 
@@ -336,42 +337,55 @@ def acquire_eurlex_document(
         file_path,
         cellar_last_modified=mod_date,
         title=title,
-    )
+    ), True
 
 
 # =============================================================================
-# Web document download (EBA, ECB)
+# Web document acquisition (EBA, ECB)
 # =============================================================================
 
-def acquire_web_document(document: dict[str, Any]) -> dict[str, Any]:
+def acquire_web_document(
+    document: dict[str, Any],
+    previous: dict[str, Any] | None,
+) -> tuple[dict[str, Any], bool]:
     """
-    Download an EBA/ECB document and write to Volume via dbutils.fs.put().
-    Always re-downloaded — these are small text files with no reliable
-    change signal equivalent to CELLAR's lastModificationDate.
+    Download an EBA/ECB document with HTTP conditional request change detection.
+
+    Sends If-Modified-Since if a previous Last-Modified is stored.
+    Returns (metadata, changed=False) on 304 Not Modified.
+    Falls back to always downloading if the server does not support
+    conditional requests.
+
+    Returns (metadata, changed) tuple.
     """
     target_path = output_dir_for(document["file_format"]) / document["file_name"]
 
+    headers: dict[str, str] = {"User-Agent": "Mozilla/5.0", "Accept": "*/*"}
+
+    if previous and previous.get("last_modified_header"):
+        headers["If-Modified-Since"] = previous["last_modified_header"]
+
     response = requests.get(
         document["source_url"],
-        headers={"User-Agent": "Mozilla/5.0", "Accept": "*/*"},
+        headers=headers,
         timeout=REQUEST_TIMEOUT,
         allow_redirects=True,
     )
+
+    if response.status_code == 304:
+        print(f"[{document['short_title']}] Unchanged (304 Not Modified). Skipping.")
+        return {**previous, "downloaded_at_utc": now_utc()}, False
+
     response.raise_for_status()
 
+    last_modified = response.headers.get("Last-Modified")
     dbutils.fs.put(str(target_path), response.text, overwrite=True)  # noqa: F821
 
-    return create_metadata(document, target_path)
-
-
-# =============================================================================
-# Manifest
-# =============================================================================
-
-def save_manifest(records: list[dict[str, Any]]) -> None:
-    content = json.dumps(records, indent=4, ensure_ascii=False)
-    dbutils.fs.put(str(MANIFEST_PATH), content, overwrite=True)  # noqa: F821
-    print(f"Manifest saved to: {MANIFEST_PATH}")
+    return create_metadata(
+        document,
+        target_path,
+        last_modified_header=last_modified,
+    ), True
 
 
 # =============================================================================
@@ -383,21 +397,29 @@ def download_corpus() -> list[dict[str, Any]]:
     print(f"Loaded previous manifest: {len(previous_manifest)} records")
     print("-" * 80)
 
-    manifest = []
+    manifest: list[dict[str, Any]] = []
+    changes_detected = False
 
     for i, document in enumerate(DOCUMENTS):
         print(f"Processing: {document['short_title']}")
         try:
+            previous = previous_manifest.get(document["document_id"])
+
             if document["file_format"] == "pdf":
-                previous = previous_manifest.get(document["document_id"])
-                metadata = acquire_eurlex_document(document, previous)
+                metadata, changed = acquire_eurlex_document(document, previous)
             else:
-                metadata = acquire_web_document(document)
+                metadata, changed = acquire_web_document(document, previous)
+
+            if changed:
+                changes_detected = True
+
             print(f"Ready: {document['file_name']}")
+
         except Exception as error:
             print(f"Failed: {document['short_title']}")
             print(f"Reason: {error}")
             metadata = create_failed_metadata(document, error)
+            changes_detected = True  # failures should always trigger the pipeline
 
         manifest.append(metadata)
         print("-" * 80)
@@ -406,6 +428,13 @@ def download_corpus() -> list[dict[str, Any]]:
             time.sleep(RATE_LIMIT_DELAY)
 
     save_manifest(manifest)
+
+    print(f"Changes detected: {changes_detected}")
+    dbutils.jobs.taskValues.set(  # noqa: F821
+        key="changes_detected",
+        value=str(changes_detected).lower(),
+    )
+
     return manifest
 
 

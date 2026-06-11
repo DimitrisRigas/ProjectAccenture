@@ -13,9 +13,18 @@ resources:
             python_file: ../src/jobs/downloader_job.py
           environment_key: bronze_environment
 
-        - task_key: bronze_ingestion
+        - task_key: check_changes
           depends_on:
             - task_key: downloader_job
+          condition_task:
+            op: EQUAL_TO
+            left: "{{tasks.downloader_job.values.changes_detected}}"
+            right: "true"
+
+        - task_key: bronze_ingestion
+          depends_on:
+            - task_key: check_changes
+              outcome: "true"
           spark_python_task:
             python_file: ../src/jobs/bronze_ingestion.py
           environment_key: bronze_environment

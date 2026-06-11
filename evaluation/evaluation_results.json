@@ -1,5 +1,5 @@
 {
-  "evaluation_timestamp": "2026-06-10T10:46:49.146318+00:00",
+  "evaluation_timestamp": "2026-06-11T07:59:37.493296+00:00",
   "top_k": 5,
   "summary": {
     "total_questions": 12,
@@ -8,8 +8,8 @@
     "questions_with_sources": 12,
     "expected_regulation_found_count": 12,
     "top_source_matches_expected_count": 12,
-    "average_keyword_coverage": 0.958,
-    "average_faithfulness_score": 4.917,
+    "average_keyword_coverage": 0.938,
+    "average_faithfulness_score": 5.0,
     "groundedness_pass_count": 12
   },
   "results": [
@@ -19,7 +19,7 @@
       "passed": true,
       "has_sources": true,
       "num_sources": 5,
-      "average_retrieval_score": 0.024582,
+      "average_retrieval_score": 0.02464,
       "regulation_check": {
         "expected_regulation": "GDPR",
         "retrieved_source_titles": [
@@ -53,9 +53,9 @@
         "faithfulness_score": 5,
         "groundedness_pass": true,
         "unsupported_claims": [],
-        "explanation": "All claims in the generated answer are directly supported by the retrieved source context. The answer accurately reflects the controller's responsibility and liability, obligation to implement and demonstrate effective measures, maintain records, cooperate with supervisory authorities, evaluate risks, and calibrate obligations according to risk, as described in the GDPR excerpts provided."
+        "explanation": "All claims in the generated answer are directly supported by the retrieved source context. The obligations of controllers to implement appropriate and effective measures, demonstrate compliance, maintain records, cooperate with supervisory authorities, and take a risk-based approach are all explicitly mentioned in the provided excerpts from the GDPR. The answer accurately reflects the content of the sources."
       },
-      "answer_preview": "Short direct answer  \nAccording to the GDPR, controllers are responsible and liable for any processing of personal data they carry out or that is carried out on their behalf. They are specifically obliged to implement appropriate and effective measures to ensure and demonstrate compliance with the GDPR, taking into account the nature, scope, context, and purposes of the processing, as well as the risks to the rights and freedoms of natural persons.\n\nKey obligations / requirements\n\n- Implement appropriate and effective measures for personal data protection.\n- Be able to demonstrate compliance with the GDPR, including the effectiveness of those measures.\n- Maintain records of processing activi"
+      "answer_preview": "Short direct answer  \nAccording to the GDPR, controllers have the obligation to implement appropriate and effective measures to protect personal data and must be able to demonstrate compliance with the Regulation. These measures should be tailored to the nature, scope, context, and purposes of processing, as well as the risks to the rights and freedoms of natural persons.\n\nKey obligations / requirements\n\n- Controllers are responsible and liable for any processing of personal data they carry out or that is carried out on their behalf [Source 5, p. 14].\n- Controllers must implement appropriate and effective measures to ensure and demonstrate compliance with the GDPR. These measures should cons"
     },
     {
       "id": "q2",
@@ -63,7 +63,7 @@
       "passed": true,
       "has_sources": true,
       "num_sources": 5,
-      "average_retrieval_score": 0.019839,
+      "average_retrieval_score": 0.019838,
       "regulation_check": {
         "expected_regulation": "DORA",
         "retrieved_source_titles": [
@@ -94,15 +94,12 @@
         "keyword_coverage": 1.0
       },
       "faithfulness_check": {
-        "faithfulness_score": 4,
+        "faithfulness_score": 5,
         "groundedness_pass": true,
-        "unsupported_claims": [
-          "Financial entities under DORA must implement robust ICT risk management and incident reporting processes, and participate in digital operational resilience testing.",
-          "Entities should review their current ICT risk and incident management frameworks to ensure alignment with DORA’s requirements and prepare for possible changes in reporting and testing obligations."
-        ],
-        "explanation": "The generated answer is mostly supported by the retrieved context, which discusses harmonised requirements for ICT risk management, incident reporting, digital operational resilience testing, proportionate application for smaller entities, and voluntary notification of significant cyber threats. However, the answer includes some interpretive and practical compliance advice (e.g., 'Entities should review their current ICT risk and incident management frameworks...') that is not directly stated in the retrieved sources. The core regulatory requirements and proportionality are well-grounded in the context."
+        "unsupported_claims": [],
+        "explanation": "All claims in the generated answer are supported by the retrieved source context. The answer accurately summarizes DORA's requirements for financial entities, including harmonized ICT risk management, incident reporting, digital operational resilience testing, proportionate application based on size and risk profile, and reduction of duplicative reporting. Each point is traceable to the provided excerpts from the DORA regulation."
       },
-      "answer_preview": "Short direct answer  \nDORA (the Digital Operational Resilience Act) requires financial entities to strengthen their digital operational resilience by complying with harmonised requirements for ICT risk management, incident reporting, and digital operational resilience testing. The regulation aims to ensure a consistent baseline of operational resilience across the EU financial sector, with proportionate application for smaller entities and those subject to simplified frameworks.\n\nKey obligations / requirements  \n- Financial entities must comply with uniform requirements for ICT risk management, incident reporting, and digital operational resilience testing.  \n- The requirements are applied p"
+      "answer_preview": "Short direct answer:  \nDORA (the Digital Operational Resilience Act) requires financial entities to strengthen their digital operational resilience by complying with harmonized requirements for ICT risk management, incident reporting, and digital operational resilience testing. The regulation also aims to reduce administrative burdens and duplicative reporting, applying requirements proportionately based on the size, risk profile, and complexity of the financial entity.\n\nKey obligations / requirements:\n- Financial entities must comply with harmonized requirements for ICT risk management and incident reporting, especially when operating across multiple Member States or as part of a financial "
     },
     {
       "id": "q3",
@@ -110,13 +107,13 @@
       "passed": true,
       "has_sources": true,
       "num_sources": 5,
-      "average_retrieval_score": 0.017089,
+      "average_retrieval_score": 0.017097,
       "regulation_check": {
         "expected_regulation": "PSD2",
         "retrieved_source_titles": [
           "PSD2",
           "PSD2",
-          "AI_Act",
+          "GDPR",
           "PSD2",
           "AI_Act"
         ],
@@ -144,9 +141,9 @@
         "faithfulness_score": 5,
         "groundedness_pass": true,
         "unsupported_claims": [],
-        "explanation": "All claims in the generated answer are directly supported by the retrieved context. The answer accurately reflects the purpose of PSD2 as establishing a harmonised regulatory framework, ensuring security, customer protection, fair competition, and enabling both existing and new service providers to operate under clear and consistent rules. The specific obligations and requirements mentioned are also supported by the cited sources."
+        "explanation": "All claims in the generated answer are directly supported by the retrieved source context. The answer accurately summarizes the purpose of PSD2 as establishing a harmonised regulatory framework, ensuring security, customer protection, and fair competition, which are all reflected in the provided excerpts from the directive. The specific obligations and requirements mentioned are also supported by the cited sources."
       },
-      "answer_preview": "Short direct answer  \nThe purpose of PSD2 (the revised Payment Services Directive) is to establish a harmonised regulatory framework for payment services within the EU, ensuring security, customer protection, fair competition, and enabling both existing and new service providers to operate under clear and consistent rules.\n\nKey obligations / requirements  \n- PSD2 aims to ensure continuity in the payment services market by allowing both existing and new providers to offer services within a harmonised regulatory framework, regardless of their business model.\n- The Directive seeks to guarantee fair competition and avoid unjustifiable discrimination among market players.\n- It places emphasis on "
+      "answer_preview": "Short direct answer:\nThe purpose of PSD2 (Payment Services Directive 2) is to establish a harmonised regulatory framework for payment services within the EU, ensuring security, customer protection, and fair competition among both existing and new payment service providers.\n\nKey obligations / requirements:\n- PSD2 sets out rules for distinguishing between different categories of payment service providers [Source 4, p. 19].\n- It aims to ensure continuity in the payment services market, allowing both existing and new providers to operate under clear and harmonised regulations [Source 2, p. 6].\n- The Directive seeks to guarantee fair competition and avoid unjustifiable discrimination among market"
     },
     {
       "id": "q4",
@@ -154,7 +151,7 @@
       "passed": true,
       "has_sources": true,
       "num_sources": 5,
-      "average_retrieval_score": 0.024789,
+      "average_retrieval_score": 0.024871,
       "regulation_check": {
         "expected_regulation": "MiFID_II",
         "retrieved_source_titles": [
@@ -188,9 +185,9 @@
         "faithfulness_score": 5,
         "groundedness_pass": true,
         "unsupported_claims": [],
-        "explanation": "All claims in the generated answer are directly supported by the retrieved source context. The answer accurately reflects MiFID II's focus on investor protection, harmonisation of rules, protection of client assets, adaptation of protection measures to investor categories, consistent protection across similar products, and coverage for persons excluded from MiFID II under compensation schemes or insurance. The practical compliance interpretation is a reasonable summary of the obligations described in the sources."
+        "explanation": "All major claims in the generated answer are directly supported by the retrieved source context. The answer accurately reflects MiFID II's focus on investor protection, including the safeguarding of client assets (Source 1), the aim to provide a high level of investor protection and increased transparency (Source 2), the existence of investor compensation schemes or equivalent insurance (Source 4), and the principles of conduct and adaptation to different investor categories (Source 5). The answer does not introduce unsupported or extraneous claims."
       },
-      "answer_preview": "Short direct answer  \nMiFID II (Markets in Financial Instruments Directive II) is closely linked to investor protection. It establishes a regulatory framework designed to ensure a high level of protection for investors when they access investment services and activities within the EU.\n\nKey obligations / requirements  \n- MiFID II aims to harmonise rules across the EU to provide a high level of investor protection, allowing investment firms to operate throughout the Union under home country supervision [Source 2, p. 1].\n- The Directive includes requirements for the protection of client assets, ensuring that investors’ ownership rights and rights in respect of funds entrusted to firms are kept "
+      "answer_preview": "Short direct answer  \nMiFID II (Markets in Financial Instruments Directive II) is closely linked to investor protection. It establishes a regulatory framework designed to offer a high level of protection to investors across the EU by harmonising rules for investment firms, increasing transparency, and strengthening the conduct of business obligations.\n\nKey obligations / requirements  \n- MiFID II requires investment firms to protect investors’ ownership rights in securities and funds, ensuring these are kept distinct from the firm’s own assets. This is a core tool for client protection in the provision of investment services [Source 1, page 8].\n- The Directive sets out that investment firms m"
     },
     {
       "id": "q5",
@@ -198,7 +195,7 @@
       "passed": true,
       "has_sources": true,
       "num_sources": 5,
-      "average_retrieval_score": 0.024768,
+      "average_retrieval_score": 0.024275,
       "regulation_check": {
         "expected_regulation": "AI_Act",
         "retrieved_source_titles": [
@@ -232,9 +229,9 @@
         "faithfulness_score": 5,
         "groundedness_pass": true,
         "unsupported_claims": [],
-        "explanation": "All claims in the generated answer are directly supported by the retrieved source context. The requirements for a documented, continuous risk management system for high-risk AI systems, including identification, analysis, evaluation, and minimization of risks to health, safety, and fundamental rights, are explicitly stated in Article 9 (Source 1) and referenced in Source 2 and Source 4. The need for ongoing monitoring and adaptation, as well as the focus on EU values and fundamental rights, is supported by Source 5. The practical compliance interpretation is a faithful summary of the obligations described in the sources."
+        "explanation": "All key claims in the generated answer are directly supported by the retrieved source context. The requirements for a risk management system for high-risk AI systems, its continuous and iterative nature, the focus on health, safety, and fundamental rights, and the need for regular review and updating are all explicitly stated in Article 9 (Source 1). The need for effective measures to prevent or minimize risks is supported by Source 2. The requirement to consider the state of the art and compliance with requirements is supported by Source 4. The practical compliance interpretation is a reasonable summary of these requirements and does not introduce unsupported claims."
       },
-      "answer_preview": "Short direct answer  \nThe EU AI Act requires high-risk AI systems to have a documented, continuous risk management system throughout their lifecycle, focusing on identifying, analyzing, evaluating, and minimizing risks to health, safety, and fundamental rights.\n\nKey obligations / requirements  \n- High-risk AI systems must establish, implement, document, and maintain a risk management system [Source 1, p. 56].\n- The risk management system is a continuous, iterative process covering the entire lifecycle of the AI system, with regular review and updating [Source 1, p. 56].\n- The system must include:\n  - Identification and analysis of known and reasonably foreseeable risks to health, safety, or "
+      "answer_preview": "Short direct answer  \nThe EU AI Act requires that high-risk AI systems are subject to a comprehensive risk management system, which is a continuous and iterative process throughout the AI system’s lifecycle. This system focuses on identifying, analyzing, estimating, and evaluating risks to health, safety, and fundamental rights, and implementing measures to prevent or minimize those risks.\n\nKey obligations / requirements\n\n- High-risk AI systems must have a risk management system that is established, implemented, documented, and maintained [Source 1, p. 56].\n- The risk management system must be a continuous, iterative process covering the entire lifecycle of the AI system, with regular system"
     },
     {
       "id": "q6",
@@ -242,7 +239,7 @@
       "passed": true,
       "has_sources": true,
       "num_sources": 5,
-      "average_retrieval_score": 0.023884,
+      "average_retrieval_score": 0.023051,
       "regulation_check": {
         "expected_regulation": "GDPR",
         "retrieved_source_titles": [
@@ -276,9 +273,9 @@
         "faithfulness_score": 5,
         "groundedness_pass": true,
         "unsupported_claims": [],
-        "explanation": "All the rights and obligations described in the generated answer are directly supported by the retrieved source context. The answer accurately summarizes the rights of access, rectification, erasure, restriction, objection, and the right to lodge a complaint, as well as practical compliance requirements for controllers. Each point is referenced and reflected in the provided excerpts from the GDPR."
+        "explanation": "All the rights and obligations described in the generated answer are directly supported by the retrieved source context. The answer accurately summarizes the GDPR's provisions on data subject rights, including access, rectification, erasure, restriction, objection, the right to lodge a complaint, and the requirement for controllers to inform data subjects of these rights. The practical compliance points are also supported by the context, such as the need for identity verification and not retaining data solely for potential requests."
       },
-      "answer_preview": "Short direct answer  \nThe GDPR provides data subjects with several key rights regarding their personal data, including the right of access, rectification, erasure (\"right to be forgotten\"), restriction of processing, objection to processing, and the right to lodge a complaint with a supervisory authority.\n\nKey obligations / requirements\n\n- Right of Access: Data subjects have the right to obtain confirmation from the controller as to whether their personal data is being processed, and, if so, access to that data and information about the processing (such as purposes, categories, recipients, storage periods, and their other rights) [Source 4, p. 43].\n- Right to Rectification and Erasure: Data "
+      "answer_preview": "Short direct answer  \nThe GDPR provides data subjects with several key rights regarding their personal data, including the right of access, rectification, erasure (\"right to be forgotten\"), restriction of processing, objection to processing, and the right to lodge a complaint with a supervisory authority.\n\nKey obligations / requirements\n\n- Right of Access: Data subjects have the right to obtain confirmation from the controller as to whether their personal data is being processed, and, if so, access to that data and information about the processing, such as purposes, categories, recipients, storage period, and their rights regarding rectification, erasure, and objection [Source 2, p. 43; Sour"
     },
     {
       "id": "q7",
@@ -286,7 +283,7 @@
       "passed": true,
       "has_sources": true,
       "num_sources": 5,
-      "average_retrieval_score": 0.029774,
+      "average_retrieval_score": 0.029353,
       "regulation_check": {
         "expected_regulation": "DORA",
         "retrieved_source_titles": [
@@ -320,9 +317,9 @@
         "faithfulness_score": 5,
         "groundedness_pass": true,
         "unsupported_claims": [],
-        "explanation": "All claims in the generated answer are directly supported by the retrieved source context. The definition of digital operational resilience is quoted from Source 5, p. 25. The requirements for a comprehensive strategy, management body responsibility, and coverage of ICT systems, people, and processes are supported by Source 1, p. 11. The need for digital operational resilience testing is supported by Source 2, p. 45 and Source 3, p. 31. The strategy elements such as risk tolerance, information security objectives, and incident detection are supported by Source 4, p. 31. The holistic and comprehensive approach described in the practical compliance interpretation is also reflected in the sources. No unsupported claims are present."
+        "explanation": "All claims in the generated answer are directly supported by the retrieved source context. The definition of digital operational resilience, the focus on ICT systems, people, and processes, the role of the management body, the requirements for a comprehensive strategy and testing, and the emphasis on cyber risk and resilience testing are all explicitly mentioned in the sources. The answer accurately synthesizes and summarizes the retrieved material without introducing unsupported information."
       },
-      "answer_preview": "Short direct answer  \nDORA (Digital Operational Resilience Act) focuses on digital operational resilience, defined as the ability of a financial entity to build, assure, and review its operational integrity and reliability by ensuring the full range of ICT-related capabilities needed to address the security of the network and information systems, including those provided by ICT third-party service providers [Source 5, p. 25].\n\nKey obligations / requirements  \n- Financial entities must develop a comprehensive digital operational resilience strategy that covers ICT systems, people, and processes, with a strong emphasis on cyber risk awareness and cyber hygiene at all organizational levels [Sou"
+      "answer_preview": "Short direct answer:  \nDORA (Digital Operational Resilience Act) focuses on the ability of financial entities to ensure the operational integrity and reliability of their ICT systems, people, and processes, specifically to address ICT-related risks, including cyber risks, through comprehensive strategies, risk management, and resilience testing.\n\nKey obligations / requirements:\n\n- Digital operational resilience under DORA is defined as the ability to build, assure, and review operational integrity and reliability by ensuring all necessary ICT-related capabilities to address network and information security, either directly or via ICT third-party service providers [Source 5, p. 25].\n- Financi"
     },
     {
       "id": "q8",
@@ -330,7 +327,7 @@
       "passed": true,
       "has_sources": true,
       "num_sources": 5,
-      "average_retrieval_score": 0.027658,
+      "average_retrieval_score": 0.026329,
       "regulation_check": {
         "expected_regulation": "AI_Act",
         "retrieved_source_titles": [
@@ -364,17 +361,17 @@
         "faithfulness_score": 5,
         "groundedness_pass": true,
         "unsupported_claims": [],
-        "explanation": "The generated answer accurately reflects the retrieved source context. It correctly describes the classification of high-risk AI systems according to Article 6 and Annex III, as well as the compliance requirements and the Commission's ability to amend the list. All claims are directly supported by the provided sources."
+        "explanation": "The generated answer accurately reflects the retrieved source context. It correctly describes the definition and classification of high-risk AI systems according to Article 6 and Annex III, as well as the types of systems included (biometrics, critical infrastructure, education, etc.). The answer also accurately mentions the regulatory requirements and the Commission's ability to amend Annex III, all of which are supported by the provided sources."
       },
-      "answer_preview": "Short direct answer  \nThe AI Act defines \"high-risk AI systems\" as those that meet certain criteria related to their intended use and potential impact, and sets out specific requirements for their compliance and risk management.\n\nKey obligations / requirements  \n1. **Classification of High-Risk AI Systems:**  \n   - An AI system is considered high-risk if it is intended to be used as a safety component of a product (or is itself a product) covered by Union harmonisation legislation listed in Annex I, and that product or system is required to undergo a third-party conformity assessment before being placed on the market or put into service [Source 4, p. 53].\n   - Additionally, AI systems listed"
+      "answer_preview": "Short direct answer  \nThe AI Act defines \"high-risk AI systems\" as those that either serve as safety components of certain regulated products or are listed in Annex III, which includes systems used in areas such as biometrics, critical infrastructure, and education. These systems are subject to strict regulatory requirements to ensure safety and protection of fundamental rights.\n\nKey obligations / requirements  \n- High-risk AI systems must comply with specific requirements laid down in the AI Act, considering their intended purpose and the state of the art in AI technologies [Source 2, p. 55].\n- The classification rules for high-risk AI systems are set out in Article 6. An AI system is consi"
     },
     {
       "id": "q9",
-      "question": "My email is [maria.test@example.com](mailto:maria.test@example.com). What does GDPR say about the protection of personal data?",
+      "question": "My email is maria.test@example.com. What does GDPR say about the protection of personal data?",
       "passed": true,
       "has_sources": true,
       "num_sources": 5,
-      "average_retrieval_score": 0.021347,
+      "average_retrieval_score": 0.021055,
       "regulation_check": {
         "expected_regulation": "GDPR",
         "retrieved_source_titles": [
@@ -409,9 +406,9 @@
         "faithfulness_score": 5,
         "groundedness_pass": true,
         "unsupported_claims": [],
-        "explanation": "All claims in the generated answer are directly supported by the retrieved source context. The answer accurately summarizes the GDPR's subject matter, scope, and objectives as stated in Article 1 and Article 2 (Source 1), and references the risks to individuals as described in Recital 75 (Source 3). The practical compliance interpretation is a faithful paraphrase of the regulation's requirements as presented in the sources."
+        "explanation": "All claims in the generated answer are directly supported by the retrieved context. The answer accurately summarizes the GDPR's subject matter, objectives, and scope as stated in Article 1 and Article 2 (Source 1), and references the risks to individuals' rights and freedoms as described in Recital 75 (Source 3). The practical compliance interpretation is a reasonable summary of the obligations implied by these articles and recitals. No unsupported or hallucinated claims are present."
       },
-      "answer_preview": "Short direct answer  \nThe General Data Protection Regulation (GDPR) establishes rules for the protection of natural persons regarding the processing of personal data, aiming to safeguard their fundamental rights and freedoms, especially their right to data protection [Source 1, p. 32].\n\nKey obligations / requirements  \n- The GDPR applies to the processing of personal data (such as email addresses) by automated means or as part of a filing system [Source 1, p. 32].\n- The regulation is designed to protect individuals from risks such as discrimination, identity theft, fraud, financial loss, reputational damage, and loss of confidentiality, among others [Source 3, p. 15].\n- The GDPR ensures that"
+      "answer_preview": "Short direct answer  \nThe General Data Protection Regulation (GDPR) establishes rules for the protection of natural persons regarding the processing of personal data, such as email addresses, and safeguards their fundamental rights and freedoms, particularly the right to data protection.\n\nKey obligations / requirements  \n- The GDPR applies to the processing of personal data, whether by automated means or as part of a filing system.  \n- The regulation aims to protect individuals’ rights and freedoms, especially their right to the protection of personal data, and ensures that the free movement of personal data within the EU is not restricted or prohibited for reasons related to data protection"
     },
     {
       "id": "q10",
@@ -419,7 +416,7 @@
       "passed": true,
       "has_sources": true,
       "num_sources": 5,
-      "average_retrieval_score": 0.02971,
+      "average_retrieval_score": 0.029758,
       "regulation_check": {
         "expected_regulation": "DORA",
         "retrieved_source_titles": [
@@ -453,9 +450,9 @@
         "faithfulness_score": 5,
         "groundedness_pass": true,
         "unsupported_claims": [],
-        "explanation": "All claims in the generated answer are directly supported by the retrieved source context. The answer correctly identifies DORA as the regulation focusing on ICT risk and digital operational resilience for financial entities, and describes its key obligations and requirements, such as consolidating rules, harmonising requirements, and establishing targeted rules for ICT risk management, incident reporting, operational resilience testing, and third-party risk monitoring. The practical compliance interpretation is also supported, referencing principle-based rules proportionate to size, risk profile, and complexity, as stated in the sources."
+        "explanation": "All claims in the generated answer are directly supported by the retrieved source context. The answer correctly identifies DORA (Regulation (EU) PE/41/2022/INIT) as the regulation focusing on ICT risk and digital operational resilience for financial entities. The key obligations and requirements listed, such as consolidating ICT risk rules, targeted rules on ICT risk management, incident reporting, operational resilience testing, and third-party risk monitoring, are explicitly mentioned in the sources. The explanation of DORA's harmonised framework and its aim to ensure high digital operational resilience across the Union financial sector is also supported. There are no unsupported claims."
       },
-      "answer_preview": "Short direct answer  \nThe regulation that focuses on ICT risk and digital operational resilience for financial entities is the Digital Operational Resilience Act (DORA).\n\nKey obligations / requirements  \nDORA consolidates and upgrades rules on ICT risk, bringing together all provisions addressing digital risk in the financial sector into a single legislative act. It establishes targeted rules on ICT risk-management capabilities, incident reporting, operational resilience testing, and ICT third-party risk monitoring for financial entities. The regulation aims to harmonise digital operational resilience requirements across the EU financial sector, ensuring a consistent and robust approach to m"
+      "answer_preview": "Short direct answer  \nThe regulation that focuses on ICT risk and digital operational resilience for financial entities is the Digital Operational Resilience Act (DORA), formally titled Regulation (EU) PE/41/2022/INIT.\n\nKey obligations / requirements  \n- DORA consolidates and upgrades rules on ICT risk, bringing together all provisions addressing digital risk in the financial sector into a single legislative act.  \n- It explicitly refers to ICT risk via targeted rules on ICT risk-management capabilities, incident reporting, operational resilience testing, and ICT third-party risk monitoring for financial entities [Source 1, page 4].  \n- DORA establishes a harmonised framework for digital ope"
     },
     {
       "id": "q11",
@@ -463,7 +460,7 @@
       "passed": true,
       "has_sources": true,
       "num_sources": 5,
-      "average_retrieval_score": 0.027381,
+      "average_retrieval_score": 0.025211,
       "regulation_check": {
         "expected_regulation": "PSD2",
         "retrieved_source_titles": [
@@ -487,19 +484,20 @@
         "found_keywords": [
           "payment",
           "services",
-          "providers",
+          "providers"
+        ],
+        "missing_keywords": [
           "security"
         ],
-        "missing_keywords": [],
-        "keyword_coverage": 1.0
+        "keyword_coverage": 0.75
       },
       "faithfulness_check": {
         "faithfulness_score": 5,
         "groundedness_pass": true,
         "unsupported_claims": [],
-        "explanation": "All claims in the generated answer are directly supported by the retrieved source context. The answer accurately references PSD2 as the primary regulation, its scope, transparency and information requirements, the inclusion of new payment services, and the aim to harmonize and address fragmentation and legal uncertainty in the EU payments market. Each point is substantiated by the provided excerpts from the directive."
+        "explanation": "All claims in the generated answer are directly supported by the retrieved source context. The answer accurately describes the regulatory framework (PSD2), authorisation requirements, scope, transparency and information obligations, rules on charges, and consumer protection, all of which are explicitly mentioned in the provided excerpts. No unsupported or hallucinated claims are present."
       },
-      "answer_preview": "Short direct answer  \nPayment services in the EU are regulated primarily by the Payment Services Directive 2 (PSD2), which sets out rules for the provision of payment services, including requirements for transparency, information, and the rights and obligations of payment service users and providers.\n\nKey obligations / requirements  \n- PSD2 applies to payment services provided within the EU, including those offered by payment institutions, post office giro institutions, and certain public authorities when not acting in their official capacity [Source 2, p. 20].\n- The directive establishes rules on transparency of conditions and information requirements for payment services, as well as the re"
+      "answer_preview": "Short direct answer  \nPayment services in the EU are regulated primarily by the revised Payment Services Directive (PSD2), which sets out requirements for authorisation, transparency, and the rights and obligations of payment service providers and users.\n\nKey obligations / requirements\n\n- Authorisation: Payment service providers, including payment institutions, must be authorised under strict and comprehensive conditions to operate throughout the EU. This ensures a harmonised regulatory framework across Member States [Source 4, p. 5].\n- Scope: PSD2 applies to payment services provided within the Union and covers a range of providers, including credit institutions, electronic money institutio"
     },
     {
       "id": "q12",
@@ -507,7 +505,7 @@
       "passed": true,
       "has_sources": true,
       "num_sources": 5,
-      "average_retrieval_score": 0.024863,
+      "average_retrieval_score": 0.024695,
       "regulation_check": {
         "expected_regulation": "AI_Act",
         "retrieved_source_titles": [
@@ -542,9 +540,9 @@
         "faithfulness_score": 5,
         "groundedness_pass": true,
         "unsupported_claims": [],
-        "explanation": "All compliance responsibilities listed in the generated answer are directly supported by the retrieved source context. Each obligation, such as conformity with requirements, quality management, documentation, logging, conformity assessment, accessibility, post-market monitoring, human oversight, cybersecurity, and cooperation in the value chain, is explicitly mentioned in the sources. The practical compliance interpretation is a faithful summary of these requirements without introducing unsupported claims."
+        "explanation": "All claims in the generated answer are directly supported by the retrieved source context. The answer accurately reflects provider obligations such as conformity assessment, quality management, documentation, human oversight, cybersecurity, and accessibility requirements, as specified in the AI Act excerpts provided. No unsupported or hallucinated claims are present."
       },
-      "answer_preview": "Short direct answer  \nHigh-risk artificial intelligence (AI) systems are subject to a range of compliance responsibilities under the EU Artificial Intelligence Act (AI Act). These include ensuring conformity with specific requirements, implementing quality management, maintaining documentation and logs, conducting conformity assessments, and integrating human oversight and cybersecurity measures.\n\nKey obligations / requirements  \n1. **Compliance with Requirements**: Providers must ensure their high-risk AI systems meet the requirements set out in Section 2 of the AI Act [Source 3, p. 62].\n2. **Identification**: Providers must indicate their name, trade name or trademark, and contact address "
+      "answer_preview": "Short direct answer  \nProviders and deployers of high-risk artificial intelligence (AI) systems have several compliance responsibilities under the AI Act, including ensuring conformity with specific requirements, maintaining documentation, implementing quality management, ensuring human oversight, and addressing cybersecurity risks.\n\nKey obligations / requirements  \n1. Providers of high-risk AI systems must:\n   - Ensure compliance with the requirements set out in Section 2 of the AI Act.\n   - Indicate their name, trade name, or trademark and contact address on the system, packaging, or documentation.\n   - Have a quality management system in place.\n   - Keep required documentation and logs ge"
     }
   ]
 }
